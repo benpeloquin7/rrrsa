@@ -11,6 +11,7 @@
 #' informatitivy(0, 0, 0) == 0.0
 #'
 informativity <- function(m_u, alpha = 1, cost = 0) {
+  if (m_u < 0 | m_u > 1) stop("Invalid semantic `m_u` value, must be betwween [0, 1]")
   ifelse(m_u == 0, 0, exp(-alpha * (-log(m_u) - cost)))
 }
 
@@ -69,8 +70,10 @@ recurse <- function(m, costs = m - m, priors = rep(1, nrow(m)), alpha = 1) {
 #' return matrix after undergoing 'depth' recursions
 #' calling 'fn' for computation
 #' @param m, matrix of semantics
-#' @param depth, number of iterations
-#' @param fn, computation during recursion
+#' @param costs, cost matrix dimensions identical to semantic matrix
+#' @param priors, prior vector same length as nrow(m)
+#' @param depth, number of recursions
+#' @param alpha, decision hyper-param
 #' @keywords recursion
 #' @export
 #' @examples
@@ -79,9 +82,10 @@ recurse <- function(m, costs = m - m, priors = rep(1, nrow(m)), alpha = 1) {
 #' colnames(m) <- c("item1", "item2")
 #' reason(m, 0)
 #' reason(m, 2)
-#'
-reason <- function(m, depth, costs = m - m, priors = rep(1, nrow(m)), alpha = 1) {
+#' priors <- c(0.1, 0.1, 0.1, 0.1, 0.6)
+reason <- function(m, costs = m - m, priors = rep(1, nrow(m)), depth = 1, alpha = 1) {
   validateDims(m, costs)
+  validateDims(m[,1], priors)
 
   while(depth > 0) {
     m <- recurse(m, costs, priors, alpha)
