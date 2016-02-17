@@ -80,7 +80,7 @@ recurse <- function(m, costs = m - m, priors = rep(1, nrow(m)), alpha = 1) {
 #' reason(m, 0)
 #' reason(m, 2)
 #'
-reason <- function(m, depth, costs = m - m, priors = rep(1, nrow(m)) alpha = 1) {
+reason <- function(m, depth, costs = m - m, priors = rep(1, nrow(m)), alpha = 1) {
   validateDims(m, costs)
 
   while(depth > 0) {
