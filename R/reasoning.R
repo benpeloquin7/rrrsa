@@ -23,6 +23,7 @@ informativity <- function(m_u, alpha = 1, cost = 0) {
 #' @export
 #'
 utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
+  validateDims(items, costs)
   normVec(mapply(informativity, items, costs, alpha = alpha))
 }
 
@@ -44,12 +45,18 @@ utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
 #' recurse(recurse(m, costs), costs)
 #'
 recurse <- function(m, costs = m - m, alpha = 1) {
+  validateDims(m, costs)
+
+  # Store before computation
   rNames <- rownames(m)
   cNames <- colnames(m)
+  ######################################
   ## Not using utility over cols ->
   # newM <- apply(t(mapply(utility, split(m, row(m)), split(costs, row(costs)), alpha = alpha)), 2, normVec)
   ## Just normalizing ->
   # newM <- apply(t(apply(m, 1, fn, costs = costs)), 2, fn, costs = costs, alpha = alpha)
+  ######################################
+  # Compute over rows and cols
   overRows <- t(mapply(utility, split(m, row(m)), split(costs, row(costs)), alpha = alpha))
   overCols <- mapply(utility, split(overRows, col(overRows)), split(costs, col(costs)), alpha = alpha)
   rownames(overCols) <- rNames
@@ -73,9 +80,25 @@ recurse <- function(m, costs = m - m, alpha = 1) {
 #' reason(m, 2)
 #'
 reason <- function(m, depth, costs = m - m, alpha = 1) {
+  validateDims(m, costs)
+
   while(depth > 0) {
     m <- recurse(m, costs, alpha)
     depth <- depth - 1
   }
   m
+}
+
+#' run_rsa
+#' run rsa reasoning over data
+#' @param data, data with n subsets of matrices
+#' @param alpha, alpha parameter
+#' @param depth, depth of recursion
+#' @keywords main
+#' @export
+#' @examples
+#' print("example needed")
+#'
+run_rrrsa <- function(data, alpha, depth) {
+  pass
 }
