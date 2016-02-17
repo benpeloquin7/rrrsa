@@ -1,4 +1,4 @@
-#' normVec
+#' normalize vectors
 #' Return a normalized vector
 #' @param v, vector to be normalized
 #' @keywords normalization
@@ -14,7 +14,7 @@ normVec <- function(v) {
   else (v / normalizer)
 }
 
-#' validateDims
+#' validate data entries
 #' Compare dimensions of two matrices or vectors
 #' @param m1, matrix 1
 #' @param m2, matrix 2
@@ -32,4 +32,18 @@ validateDims <- function(m1, m2) {
   if (type1 != type2) stop("Object types do not match")
   if (is.matrix(m1) & !all(dim(m1) == dim(m2))) stop("Matrix dimensions do not match")
   if (is.vector(m1) & (length(m1) != length(m2))) stop("Vector lengths do not match")
+}
+
+#' convert data to correct structure for reasoning
+#' data should be passed in 'long' format with 4 cols ->
+#' Group ::
+#' Quantity ::
+#' Item ::
+#' Semantics ::
+#' @importFrom tidyr gather
+#' @importFrom magrittr `%>%`
+#'
+convertData <- function(group = "scale", quantity = "stars", items = "degrees", semantics = "speaker.p") {
+  "not yet implemented"
+
 }

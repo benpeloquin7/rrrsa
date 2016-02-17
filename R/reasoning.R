@@ -100,10 +100,9 @@ reason <- function(m, costs = m - m, priors = rep(1, nrow(m)), depth = 1, alpha 
 #' @param alpha, alpha parameter
 #' @param depth, depth of recursion
 #' @keywords main
-#' @export
 #' @examples
 #' print("example needed")
 #'
 run_rrrsa <- function(data, alpha, depth) {
-  pass
+  "not yet implemented"
 }
