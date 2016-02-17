@@ -24,10 +24,7 @@ informativity <- function(m_u, alpha = 1, cost = 0) {
 #'
 utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
   validateDims(items, costs)
-#   print(normVec(mapply(informativity, items, costs, alpha = alpha)))
-#   print(mapply(informativity, items, costs, alpha = alpha))
   normVec(mapply(informativity, items, costs, alpha = alpha))
-#   mapply(informativity, items, costs, alpha = alpha)
 }
 
 #' recurse
@@ -83,11 +80,11 @@ recurse <- function(m, costs = m - m, priors = rep(1, nrow(m)), alpha = 1) {
 #' reason(m, 0)
 #' reason(m, 2)
 #'
-reason <- function(m, depth, costs = m - m, alpha = 1) {
+reason <- function(m, depth, costs = m - m, priors = rep(1, nrow(m)) alpha = 1) {
   validateDims(m, costs)
 
   while(depth > 0) {
-    m <- recurse(m, costs, alpha)
+    m <- recurse(m, costs, priors, alpha)
     depth <- depth - 1
   }
   m
