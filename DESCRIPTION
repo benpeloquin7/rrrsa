@@ -1,8 +1,12 @@
 Package: rrrsa
-Title: What the Package Does (one line, title case)
+Title: Really recursive rational speeach act (rrrsa) models of pragmatic inference (Frank \& Goodman 2012).
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-Depends: R (>= 3.2.3)
+Authors@R: person("Ben", "Peloquin", email = "bpeloqui@stanford.edu", role = c("aut", "cre"))
+Description: Model pragmatic inference (e.g. scalar implicature)
+Depends:
+    R (>= 3.2.3)
+Imports: tidyr, ggplot2
 License: What license is it under?
 LazyData: true
+RoxygenNote: 5.0.1
+Suggests: testthat
