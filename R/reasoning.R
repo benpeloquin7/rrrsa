@@ -24,14 +24,18 @@ informativity <- function(m_u, alpha = 1, cost = 0) {
 #'
 utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
   validateDims(items, costs)
+#   print(normVec(mapply(informativity, items, costs, alpha = alpha)))
+#   print(mapply(informativity, items, costs, alpha = alpha))
   normVec(mapply(informativity, items, costs, alpha = alpha))
+#   mapply(informativity, items, costs, alpha = alpha)
 }
 
 #' recurse
 #' one full recursion between listener -> speaker -> listener
 #' @param m, matrix of semantics (rows = meaning, cols = words)
-#' @param fn, action to perform during recurison either 'normVec'
-#' for simple normalization or 'utility' to compute utility
+#' @param costs, matrix of costs (default is 0)
+#' @param priors, default uniform, vector of length nrow() [semantic quantity]
+#' @param alpha, decision hyper-param
 #' @keywords recursion
 #' @export
 #' @examples
@@ -44,21 +48,21 @@ utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
 #' recurse(m, costs)
 #' recurse(recurse(m, costs), costs)
 #'
-recurse <- function(m, costs = m - m, alpha = 1) {
+recurse <- function(m, costs = m - m, priors = rep(1, nrow(m)), alpha = 1) {
   validateDims(m, costs)
 
-  # Store before computation
+  # Store naming labels
   rNames <- rownames(m)
   cNames <- colnames(m)
-  ######################################
-  ## Not using utility over cols ->
-  # newM <- apply(t(mapply(utility, split(m, row(m)), split(costs, row(costs)), alpha = alpha)), 2, normVec)
-  ## Just normalizing ->
-  # newM <- apply(t(apply(m, 1, fn, costs = costs)), 2, fn, costs = costs, alpha = alpha)
-  ######################################
-  # Compute over rows and cols
+
+  # Likelihood (compute over rows) ------ :: p(u | m)
   overRows <- t(mapply(utility, split(m, row(m)), split(costs, row(costs)), alpha = alpha))
-  overCols <- mapply(utility, split(overRows, col(overRows)), split(costs, col(costs)), alpha = alpha)
+  # Priors ------------------------------ :: p(u | m) * p(m)
+  withPriors <- apply(overRows, 2, function(i) priors * i)
+  # Normalization (compute over cols) --- :: [p(u | m) * p(m)] / (\sum_m p(m | u) * p(m))
+  overCols <- mapply(utility, split(withPriors, col(withPriors)), split(costs, col(costs)), alpha = alpha)
+
+  # Labels
   rownames(overCols) <- rNames
   colnames(overCols) <- cNames
   overCols
