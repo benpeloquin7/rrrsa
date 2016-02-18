@@ -47,18 +47,22 @@ validateDims <- function(m1, m2) {
 #' @param semantics, normalized distribution over quantity (e.g. compatibility DV)
 #' @importFrom magrittr "%>%"
 #' @importFrom tidyr gather
+#' @importFrom dplyr mutate
 #' @export
 #' @examples
-#' d <- data.frame(groups = rep("some_all", 10),
-#' quantity = rep(1:5, 2),
-#' items = c(rep("strong", 5), rep("weak", 5)),
-#' semantics = c(0, 0, 0, 0.3, 0.7,
+#' d <- data.frame(scales = rep("some_all", 10),
+#' stars = rep(1:5, 2),
+#' degrees = c(rep("strong", 5), rep("weak", 5)),
+#' speaker.p = c(0, 0, 0, 0.3, 0.7,
 #' 0, 0.1, 0.15, 0.35, 0.40),
-#' pragmatics = c(0, 0, 0, 0.15, 0.85,
+#' listener.p = c(0, 0, 0, 0.15, 0.85,
 #' 0, 0.1, 0.25, 0.5, 0.15))
-#' convertData(d, group = "groups", quantity = "quantity", item = "items", semantics = "semantics")
+#' convertData(d, group = "scales", quantity = "stars", item = "degrees", semantics = "speaker.p")
 #'
-convertData <- function(data, group = "scale", quantity = "stars", item = "degrees", semantics = "speaker.p") {
+convertData <- function(data, group, quantity, item, semantics) {
+
+  # save original data
+  originalData <- data
 
   # Verify valid data fields
   # ------------------------
@@ -70,20 +74,33 @@ convertData <- function(data, group = "scale", quantity = "stars", item = "degre
     stop("Data set is missing fields")
   }
 
+  # Rename for serialization and maintain old names
+  renameDfCols <- function(df, group, quantity, item, semantics) {
+    oldNames <- c(group, quantity, item, semantics)
+    names(df)[names(df) == group] <- "group"
+    names(df)[names(df) == quantity] <- "quantity"
+    names(df)[names(df) == item] <- "item"
+    names(df)[names(df) == semantics] <- "semantics"
+    list(df, oldNames)
+  }
+  out <- renameDfCols(data, group, quantity, item, semantics)
+
   # Verify valid dimensions
   # -----------------------
   # currently assuming we have groupings
   groupings <- unique(data$group)
   quantities <- unique(data$quantity)
   items <- unique(data$item)
-  if (length(groupings) * length(quantities) * length(items) != length(semantics)) {
+  if (length(groupings) * length(quantities) * length(items) != length(data$semantics)) {
     stop("Invalid data dimensions")
   }
 
-  # Convert to semantics for (near) matrix representation
-  out <- data %>%
-    select(groups, quantity, items, semantics) %>%
-    spread(items, semantics)
 
-  out
+  # Convert to semantics for (near) matrix representation
+  newData <- out[[1]] %>%
+    select(group, quantity, item, semantics) %>%
+    mutate(semantics = as.numeric(semantics)) %>%
+    spread(item, semantics)
+
+  list(newData, out[[2]], originalData)
 }
