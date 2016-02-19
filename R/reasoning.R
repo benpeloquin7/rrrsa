@@ -11,7 +11,7 @@
 #' informatitivy(0, 0, 0) == 0.0
 #'
 informativity <- function(m_u, alpha = 1, cost = 0) {
-  if (m_u < 0 | m_u > 1) stop("Invalid semantic `m_u` value, must be betwween [0, 1]")
+  if (m_u < 0 | m_u > 1) stop("Invalid semantic `m_u` value, must be between [0, 1]")
   ifelse(m_u == 0, 0, exp(-alpha * (-log(m_u) - cost)))
 }
 
@@ -96,13 +96,27 @@ reason <- function(m, costs = m - m, priors = rep(1, nrow(m)), depth = 1, alpha 
 
 #' run_rsa
 #' run rsa reasoning over data
-#' @param data, data with n subsets of matrices
+#' @param data, data passed after call to convertData
 #' @param alpha, alpha parameter
 #' @param depth, depth of recursion
 #' @keywords main
 #' @examples
-#' print("not yet implemented")
+#' print("not yet implemente")
 #'
 run_rrrsa <- function(data, alpha, depth) {
-  "not yet implemented"
+  # given data, alpha and depth
+  ## verify these data (data, alpha, depth)
+
+  runData <- data$runData
+  groups <- unique(runData$groups)
+  for (g in groups) {
+    # convert to matrix
+    mData <- runData %>%
+      dplyr::filter(group == g) %>%
+      convertDf2Matrix()
+
+    modelPreds <- reason(m = mData)
+
+    # add posteriors to output?
+  }
 }
