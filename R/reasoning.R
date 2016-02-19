@@ -103,20 +103,22 @@ reason <- function(m, costs = m - m, priors = rep(1, nrow(m)), depth = 1, alpha 
 #' @examples
 #' print("not yet implemente")
 #'
-run_rrrsa <- function(data, alpha, depth) {
+run_rrrsa <- function(data, alpha = 1, depth = 1) {
   # given data, alpha and depth
   ## verify these data (data, alpha, depth)
 
   runData <- data$runData
   groups <- unique(runData$group)
+
   for (g in groups) {
     # convert to matrix
     mData <- runData %>%
       dplyr::filter(group == g) %>%
       convertDf2Matrix()
 
-    modelPreds <- reason(m = mData)
-    modelPreds
-    # add posteriors to output?
+    # Run rsa (currently not handling costs)
+    modelPreds <- reason(m = mData, depth = depth, alpha = alpha)
+
+
   }
 }
