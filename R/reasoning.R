@@ -108,7 +108,7 @@ run_rrrsa <- function(data, alpha, depth) {
   ## verify these data (data, alpha, depth)
 
   runData <- data$runData
-  groups <- unique(runData$groups)
+  groups <- unique(runData$group)
   for (g in groups) {
     # convert to matrix
     mData <- runData %>%
@@ -116,7 +116,7 @@ run_rrrsa <- function(data, alpha, depth) {
       convertDf2Matrix()
 
     modelPreds <- reason(m = mData)
-
+    modelPreds
     # add posteriors to output?
   }
 }
