@@ -146,16 +146,54 @@ convertMatrix2Df <- function(m, group) {
   df
 }
 
-
+#' Rename group, quantity, item and semantics columns in user df for use in RSA
+#' @param df, data frame of measurements
+#' @param group, group name (e.g. "scales")
+#' @param quantity, quantity we're quantifying over (e.g. "stars")
+#' @param item, items we're examining (either individual words
+#' ("some", "all", or degrees, "weak", "strong))
+#' @param semantics, normalized compatibility measures
+#' @keywords data_org
+#' @export
+#' @examples
+#' d <- data.frame(scales = rep("some_all", 10),
+#' stars = as.factor(rep(1:5, 2)),
+#' degrees = c(rep("strong", 5), rep("weak", 5)),
+#' speaker.p = c(0, 0, 0, 0.3, 0.7,
+#' 0, 0.1, 0.15, 0.35, 0.40),
+#' pragmatics = c(0, 0, 0, 0.15, 0.85,
+#' 0, 0.1, 0.25, 0.5, 0.15))
+#' newDf <- renameRSACols(d, group = "scales", quantity = "stars",
+#' item = "degrees", semantics = "speaker.p")
+#' newDf$data
+#' newDf$labels
+#'
 renameRSACols <- function(df, group, quantity, item, semantics) {
   oldNames <- c(group = group, quantity = quantity, item = item, semantics = semantics)
   names(df)[names(df) == group] <- "group"
   names(df)[names(df) == quantity] <- "quantity"
   names(df)[names(df) == item] <- "item"
   names(df)[names(df) == semantics] <- "semantics"
-  list(df, oldNames)
+  list(data = df, labels = oldNames)
 }
 
+#' Return to original names (before renameRSACols()) for output
+#' @param df, data frame with renamed columns
+#' @param oldNames, original names
+#' @keywords data_org
+#' @export
+#' @examples
+#' d <- data.frame(scales = rep("some_all", 10),
+#' stars = as.factor(rep(1:5, 2)),
+#' degrees = c(rep("strong", 5), rep("weak", 5)),
+#' speaker.p = c(0, 0, 0, 0.3, 0.7,
+#' 0, 0.1, 0.15, 0.35, 0.40),
+#' pragmatics = c(0, 0, 0, 0.15, 0.85,
+#' 0, 0.1, 0.25, 0.5, 0.15))
+#' newDf <- renameRSACols(d, group = "scales", quantity = "stars",
+#' item = "degrees", semantics = "speaker.p")
+#' unnameRSACols(newDf$data, newDf$labels)
+#'
 unnameRSACols <- function(df, oldNames) {
   newDf <- df
   names(newDf)[names(newDf) == "group"] <- oldNames[[which(names(oldNames) == "group")]]
