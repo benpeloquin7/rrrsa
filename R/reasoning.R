@@ -104,12 +104,16 @@ reason <- function(m, costs = m - m, priors = rep(1, nrow(m)), depth = 1, alpha 
 #' print("not yet implemente")
 #'
 run_rrrsa <- function(data, alpha = 1, depth = 1) {
-  # given data, alpha and depth
-  ## verify these data (data, alpha, depth)
+  # ------- Data verification checks here -------
+  # ------- Data verification checks here -------
 
+  # Prep data subgroups
   runData <- data$runData
+  originalData <- data$orginalData
   groups <- unique(runData$group)
 
+  # DF for model predictions to populate with runs
+  preds <- data.frame()
   for (g in groups) {
     # convert to matrix
     mData <- runData %>%
@@ -117,8 +121,11 @@ run_rrrsa <- function(data, alpha = 1, depth = 1) {
       convertDf2Matrix()
 
     # Run rsa (currently not handling costs)
-    modelPreds <- reason(m = mData, depth = depth, alpha = alpha)
+    modelPreds <- reason(m = mData, depth = depth, alpha = alpha) %>%
+      convertMatrix2Df(., group = g)
 
-
+    preds <- rbind(preds, modelPreds)
   }
+  preds %>%
+    gather(key = item, value = modelPreds, -c(group, quantity))
 }
