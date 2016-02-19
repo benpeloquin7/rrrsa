@@ -45,9 +45,10 @@ validateDims <- function(m1, m2) {
 #' @param quantity, quantity for assessing semantic compatibility (e.g. stars <1...5>)
 #' @param item, invidiual word or degree level items (e.g. <strong, weak> or <hi, low> or <some, all>)
 #' @param semantics, normalized distribution over quantity (e.g. compatibility DV)
+#' @keywords data_org
 #' @importFrom magrittr "%>%"
-#' @importFrom tidyr gather
-#' @importFrom dplyr mutate
+#' @importFrom tidyr gather spread
+#' @importFrom dplyr mutate select
 #' @export
 #' @examples
 #' d <- data.frame(scales = rep("some_all", 10),
@@ -97,10 +98,36 @@ convertData <- function(data, group, quantity, item, semantics) {
 
 
   # Convert to semantics for (near) matrix representation
-  newData <- out[[1]] %>%
+  runData <- out[[1]] %>%
     select(group, quantity, item, semantics) %>%
     mutate(semantics = as.numeric(semantics)) %>%
     spread(item, semantics)
 
-  list(newData, out[[2]], originalData)
+  list(runData = runData, labels = out[[2]], originalData = originalData)
+}
+
+#' Convert an RSA data frame to matrix for running RSA
+#' @param df, data frame containing at least group, quantity and two more cols (for items)
+#' @keywords data_org
+#' @importFrom magrittr "%>%"
+#' @importFrom dplyr select
+#' @export
+#' @examples
+#' d <- data.frame(scales = rep("some_all", 10),
+#' stars = as.factor(rep(1:5, 2)),
+#' degrees = c(rep("strong", 5), rep("weak", 5)),
+#' speaker.p = c(0, 0, 0, 0.3, 0.7,
+#' 0, 0.1, 0.15, 0.35, 0.40),
+#' pragmatics = c(0, 0, 0, 0.15, 0.85,
+#' 0, 0.1, 0.25, 0.5, 0.15))
+#' cData <- convertData(d)
+#' convertDf2Matrix(cData)
+#'
+convertDf2Matrix <- function(df) {
+  if (!("runData" %in% names(df))) stop("Invalid data passed")
+
+  m <- df$runData %>%
+    select(-c(group, quantity)) %>%
+    as.matrix()
+  m
 }
