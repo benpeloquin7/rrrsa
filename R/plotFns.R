@@ -4,8 +4,8 @@
 #' @param processedData, data frame after proceessing (from calling processData())
 #' @keywords plotting
 #' @examples
-#'
-#' processedData <- processData(practiceData)
+#' d <- data(practiceData)
+#' processedData <- processData(d)
 #' plotSemantics(processedData)
 #'
 plotSemantics <- function(processedData) {
