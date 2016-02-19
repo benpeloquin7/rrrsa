@@ -104,15 +104,16 @@ reason <- function(m, costs = m - m, priors = rep(1, nrow(m)), depth = 1, alpha 
 #' print("not yet implemente")
 #'
 run_rrrsa <- function(data, alpha = 1, depth = 1) {
-  # ------- Data verification checks here -------
-  # ------- Data verification checks here -------
+  # ------- Data verification checks here ------- #
+  # ------- Data verification checks here ------- #
 
   # Prep data subgroups
   runData <- data$runData
   originalData <- data$orginalData
   groups <- unique(runData$group)
+  originalLabels <- data$labels
 
-  # DF for model predictions to populate with runs
+  # predictions DF for rsa
   preds <- data.frame()
   for (g in groups) {
     # convert to matrix
@@ -126,6 +127,10 @@ run_rrrsa <- function(data, alpha = 1, depth = 1) {
 
     preds <- rbind(preds, modelPreds)
   }
-  preds %>%
-    gather(key = item, value = modelPreds, -c(group, quantity))
+  predDf <- preds %>%
+    tidyr::gather(key = item, value = modelPreds, -c(group, quantity)) %>%
+    unnameRSACols(originalLabels = originalLabels)
+
+  # Add predictions column and return original data
+  merge(data$originalData, predDf)
 }
