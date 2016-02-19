@@ -34,7 +34,7 @@ validateDims <- function(m1, m2) {
   if (is.vector(m1) & (length(m1) != length(m2))) stop("Vector lengths do not match")
 }
 
-#' convert data to correct structure for conversion to matrix for reasoning()
+#' process data to correct structure for conversion to matrix for reasoning()
 #' data should be passed in 'long' format with 4 cols ->
 #' 1) Group ::
 #' 2) Quantity ::
@@ -47,8 +47,6 @@ validateDims <- function(m1, m2) {
 #' @param semantics, normalized distribution over quantity (e.g. compatibility DV)
 #' @keywords data_org
 #' @importFrom magrittr "%>%"
-#' @importFrom tidyr gather spread
-#' @importFrom dplyr mutate select
 #' @export
 #' @examples
 #' d <- data.frame(scales = rep("some_all", 10),
@@ -60,13 +58,12 @@ validateDims <- function(m1, m2) {
 #' 0, 0.1, 0.25, 0.5, 0.15))
 #' convertData(d, group = "scales", quantity = "stars", item = "degrees", semantics = "speaker.p")
 #'
-convertData <- function(data, group, quantity, item, semantics) {
+processData <- function(data, group, quantity, item, semantics) {
 
   # save original data
   originalData <- data
 
   # Verify valid data fields
-  # ------------------------
   cols <- names(data)
   if (!all(group %in% cols &&
              quantity %in% cols &&
@@ -76,19 +73,10 @@ convertData <- function(data, group, quantity, item, semantics) {
   }
 
   # Rename for serialization and maintain old names
-  renameDfCols <- function(df, group, quantity, item, semantics) {
-    oldNames <- c(group, quantity, item, semantics)
-    names(df)[names(df) == group] <- "group"
-    names(df)[names(df) == quantity] <- "quantity"
-    names(df)[names(df) == item] <- "item"
-    names(df)[names(df) == semantics] <- "semantics"
-    list(df, oldNames)
-  }
-  out <- renameDfCols(data, group, quantity, item, semantics)
+  out <- renameRSACols(data, group, quantity, item, semantics)
 
   # Verify valid dimensions
-  # -----------------------
-  # currently assuming we have groupings
+  # (currently assuming we have groupings)
   groupings <- unique(data$group)
   quantities <- unique(data$quantity)
   items <- unique(data$item)
@@ -96,13 +84,13 @@ convertData <- function(data, group, quantity, item, semantics) {
     stop("Invalid data dimensions")
   }
 
-
   # Convert to semantics for (near) matrix representation
   runData <- out[[1]] %>%
-    select(group, quantity, item, semantics) %>%
-    mutate(semantics = as.numeric(semantics)) %>%
-    spread(item, semantics)
+    dplyr::select(group, quantity, item, semantics) %>%
+    dplyr::mutate(semantics = as.numeric(semantics)) %>%
+    tidyr::spread(item, semantics)
 
+  # Important labels here, used to validate data passed to later fns()
   list(runData = runData, labels = out[[2]], originalData = originalData)
 }
 
@@ -124,10 +112,55 @@ convertData <- function(data, group, quantity, item, semantics) {
 #' convertDf2Matrix(cData)
 #'
 convertDf2Matrix <- function(df) {
-  if (!("runData" %in% names(df))) stop("Invalid data passed")
+  if (!("group" %in% names(df) && "quantity" %in% names(df))) stop("Invalid data passed")
 
-  m <- df$runData %>%
-    select(-c(group, quantity)) %>%
+  m <- df %>%
+    dplyr::select(-c(group, quantity)) %>%
     as.matrix()
   m
+}
+
+#' Convert an RSA matrix to data frame for return to user
+#' append group and quantity columns (for matching in return df)
+#' @param m, matrix
+#' @keywords data_org
+#' @importFrom magrittr "%>%"
+#' @export
+#' @examples
+#' d <- data.frame(scales = rep("some_all", 10),
+#' stars = as.factor(rep(1:5, 2)),
+#' degrees = c(rep("strong", 5), rep("weak", 5)),
+#' speaker.p = c(0, 0, 0, 0.3, 0.7,
+#' 0, 0.1, 0.15, 0.35, 0.40),
+#' pragmatics = c(0, 0, 0, 0.15, 0.85,
+#' 0, 0.1, 0.25, 0.5, 0.15))
+#' cData <- convertData(d)
+#' mData <- convertDf2Matrix(cData$runData)
+#' convertMatrix2Df(mData)
+#'
+convertMatrix2Df <- function(m, group) {
+  quantity <-
+    df <- as.data.frame(m) %>%
+    dplyr::mutate(group = group,
+                  quantity = rownames(.))
+  df
+}
+
+
+renameRSACols <- function(df, group, quantity, item, semantics) {
+  oldNames <- c(group = group, quantity = quantity, item = item, semantics = semantics)
+  names(df)[names(df) == group] <- "group"
+  names(df)[names(df) == quantity] <- "quantity"
+  names(df)[names(df) == item] <- "item"
+  names(df)[names(df) == semantics] <- "semantics"
+  list(df, oldNames)
+}
+
+unnameRSACols <- function(df, oldNames) {
+  newDf <- df
+  names(newDf)[names(newDf) == "group"] <- oldNames[[which(names(oldNames) == "group")]]
+  names(newDf)[names(newDf) == "quantity"] <- oldNames[[which(names(oldNames) == "quantity")]]
+  names(newDf)[names(newDf) == "item"] <- oldNames[[which(names(oldNames) == "item")]]
+  names(newDf)[names(newDf) == "semantics"] <- oldNames[[which(names(oldNames) == "semantics")]]
+  newDf
 }
