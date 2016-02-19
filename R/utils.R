@@ -1,41 +1,6 @@
-#' normalize vectors
-#' Return a normalized vector
-#' @param v, vector to be normalized
-#' @keywords normalization
-#' @examples
-#' vec1 <- c(1, 1, 1)
-#' norm(vec1)
-#' vec2 <- c(0, 0, 0, 0)
-#' norm(vec2)
+#' Process data to correct structure for conversion to matrix for reasoning()
 #'
-normVec <- function(v) {
-  normalizer = sum(v)
-  if (normalizer == 0) rep(0, length(v))
-  else (v / normalizer)
-}
-
-#' validate data entries
-#' Compare dimensions of two matrices or vectors
-#' @param m1, matrix 1
-#' @param m2, matrix 2
-#' @keywords safety_checks
-#' @examples
-#' m1 <- matrix(data = 1:4, nrow = 2)
-#' m2 <- matrix(data = 5:8, nrow = 2)
-#' m3 <- matrix(data = 5:10, nrow = 2)
-#' validateDims(m1, m2)
-#' validateDims(m1, m3)
-#'
-validateDims <- function(m1, m2) {
-  type1 <- typeof(m1)
-  type2 <- typeof(m2)
-  if (type1 != type2) stop("Object types do not match")
-  if (is.matrix(m1) & !all(dim(m1) == dim(m2))) stop("Matrix dimensions do not match")
-  if (is.vector(m1) & (length(m1) != length(m2))) stop("Vector lengths do not match")
-}
-
-#' process data to correct structure for conversion to matrix for reasoning()
-#' data should be passed in 'long' format with 4 cols ->
+#' Data should be passed in 'long' format with 4 required fields
 #' 1) Group ::
 #' 2) Quantity ::
 #' 3) Item ::
@@ -45,6 +10,7 @@ validateDims <- function(m1, m2) {
 #' @param quantity, quantity for assessing semantic compatibility (e.g. stars <1...5>)
 #' @param item, invidiual word or degree level items (e.g. <strong, weak> or <hi, low> or <some, all>)
 #' @param semantics, normalized distribution over quantity (e.g. compatibility DV)
+#' @return, fill this out
 #' @keywords data_org
 #' @importFrom magrittr "%>%"
 #' @export
@@ -66,9 +32,9 @@ processData <- function(data, group, quantity, item, semantics) {
   # Verify valid data fields
   cols <- names(data)
   if (!all(group %in% cols &&
-             quantity %in% cols &&
-             item %in% cols &&
-             semantics %in% cols)) {
+           quantity %in% cols &&
+           item %in% cols &&
+           semantics %in% cols)) {
     stop("Data set is missing fields")
   }
 
@@ -94,8 +60,33 @@ processData <- function(data, group, quantity, item, semantics) {
   list(runData = runData, labels = out[[2]], originalData = originalData)
 }
 
+#' Validate data entries
+#'
+#' Compare dimensions of two matrices or vectors
+#' @param m1, matrix 1
+#' @param m2, matrix 2
+#' @return, fill this out
+#' @keywords safety_checks
+#' @examples
+#' m1 <- matrix(data = 1:4, nrow = 2)
+#' m2 <- matrix(data = 5:8, nrow = 2)
+#' m3 <- matrix(data = 5:10, nrow = 2)
+#' validateDims(m1, m2)
+#' validateDims(m1, m3)
+#'
+validateDims <- function(m1, m2) {
+  type1 <- typeof(m1)
+  type2 <- typeof(m2)
+  if (type1 != type2) stop("Object types do not match")
+  if (is.matrix(m1) & !all(dim(m1) == dim(m2))) stop("Matrix dimensions do not match")
+  if (is.vector(m1) & (length(m1) != length(m2))) stop("Vector lengths do not match")
+}
+
+
 #' Convert an RSA data frame to matrix for running RSA
+#'
 #' @param df, data frame containing at least group, quantity and two more cols (for items)
+#' @return, fill this out
 #' @keywords data_org
 #' @importFrom magrittr "%>%"
 #' @importFrom dplyr select
@@ -123,6 +114,7 @@ convertDf2Matrix <- function(df) {
 #' Convert an RSA matrix to data frame for return to user
 #' append group and quantity columns (for matching in return df)
 #' @param m, matrix
+#' @return, fill this out
 #' @keywords data_org
 #' @importFrom magrittr "%>%"
 #' @export
@@ -147,12 +139,15 @@ convertMatrix2Df <- function(m, group) {
 }
 
 #' Rename group, quantity, item and semantics columns in user df for use in RSA
+#'
 #' @param df, data frame of measurements
 #' @param group, group name (e.g. "scales")
 #' @param quantity, quantity we're quantifying over (e.g. "stars")
 #' @param item, items we're examining (either individual words
 #' ("some", "all", or degrees, "weak", "strong))
 #' @param semantics, normalized compatibility measures
+#' @return, fill this out
+#' @seealso Called by \code{processData()}
 #' @keywords data_org
 #' @export
 #' @examples
@@ -178,9 +173,12 @@ renameRSACols <- function(df, group, quantity, item, semantics) {
 }
 
 #' Return to original names (before renameRSACols()) for output
+#'
 #' @param df, data frame with renamed columns
 #' @param oldNames, original names
+#' @return, fill this out
 #' @keywords data_org
+#' @seealso Called by \code{run_rrrsa}
 #' @export
 #' @examples
 #' d <- data.frame(scales = rep("some_all", 10),
@@ -194,11 +192,33 @@ renameRSACols <- function(df, group, quantity, item, semantics) {
 #' item = "degrees", semantics = "speaker.p")
 #' unnameRSACols(newDf$data, newDf$labels)
 #'
-unnameRSACols <- function(df, oldNames) {
+unnameRSACols <- function(df, originalLabels) {
   newDf <- df
-  names(newDf)[names(newDf) == "group"] <- oldNames[[which(names(oldNames) == "group")]]
-  names(newDf)[names(newDf) == "quantity"] <- oldNames[[which(names(oldNames) == "quantity")]]
-  names(newDf)[names(newDf) == "item"] <- oldNames[[which(names(oldNames) == "item")]]
-  names(newDf)[names(newDf) == "semantics"] <- oldNames[[which(names(oldNames) == "semantics")]]
+  names(newDf)[names(newDf) == "group"] <-
+    originalLabels[[which(names(originalLabels) == "group")]]
+  names(newDf)[names(newDf) == "quantity"] <-
+    originalLabels[[which(names(originalLabels) == "quantity")]]
+  names(newDf)[names(newDf) == "item"] <-
+    originalLabels[[which(names(originalLabels) == "item")]]
+  names(newDf)[names(newDf) == "semantics"] <-
+    originalLabels[[which(names(originalLabels) == "semantics")]]
   newDf
+}
+
+#' Normalize vectors
+#'
+#' Return a normalized vector
+#' @param v, vector to be normalized
+#' @return, fill this out
+#' @keywords normalization
+#' @examples
+#' vec1 <- c(1, 1, 1)
+#' norm(vec1)
+#' vec2 <- c(0, 0, 0, 0)
+#' norm(vec2)
+#'
+normVec <- function(v) {
+  normalizer = sum(v)
+  if (normalizer == 0) rep(0, length(v))
+  else (v / normalizer)
 }
