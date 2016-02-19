@@ -5,7 +5,7 @@ Authors@R: person("Ben", "Peloquin", email = "bpeloqui@stanford.edu", role = c("
 Description: Model pragmatic inference (e.g. scalar implicature)
 Depends:
     R (>= 3.2.3)
-Imports: tidyr, ggplot2
+Imports: dplyr, tidyr, ggplot2, magrittr
 License: What license is it under?
 LazyData: true
 RoxygenNote: 5.0.1
