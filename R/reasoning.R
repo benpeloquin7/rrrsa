@@ -92,7 +92,11 @@ rsa.reason <- function(m, costs = m - m, priors = rep(1, nrow(m)), depth = 1, al
 #' rsa.fullRecursion(rsa.fullRecursion(m, costs), costs)
 #'
 rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), alpha = 1) {
-  # validateDims(m, costs)
+  ## Validation checks
+  ## Costs correspond with itesm (cols)
+  ## Priors correspond with semantics (rows)
+  if (length(costs) != ncol(m)) stop("Incorrect cost vector dimensions")
+  if (length(priors) != nrow(m)) stop("Incorrect priors vector dimensions")
 
   ## Store matrix naming labels
   rNames <- rownames(m)
