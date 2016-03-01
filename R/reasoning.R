@@ -45,13 +45,12 @@ rsa.batchRun <- function(data, alpha = 1, depth = 1) {
 #' Run (multiple) iterations RSA \code{rsa.fullRecursion()}
 #'
 #' Return matrix after undergoing 'depth' recursions
-#' calling 'fn' for computation
 #' @param m, matrix of semantics
-#' @param costs, cost matrix dimensions identical to semantic matrix
-#' @param priors, prior vector same length as nrow(m)
+#' @param costs, length m vector of costs (default is 0 valued vector)
+#' @param priors, default uniform, vector of length nrow() [semantic quantity]
 #' @param depth, number of recursions
-#' @param alpha, decision hyper-param
-#' @return, fill this out
+#' @param alpha, decision hyper-parameter
+#' @return, return a matrix of posteriors
 #' @keywords recursion
 #' @export
 #' @examples
@@ -61,9 +60,12 @@ rsa.batchRun <- function(data, alpha = 1, depth = 1) {
 #' rsa.reason(m, 0)
 #' rsa.reason(m, 2)
 #' priors <- c(0.1, 0.1, 0.1, 0.1, 0.6)
-rsa.reason <- function(m, costs = m - m, priors = rep(1, nrow(m)), depth = 1, alpha = 1) {
-  validateDims(m, costs)
-  validateDims(m[,1], priors)
+rsa.reason <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), depth = 1, alpha = 1) {
+  ## Validation checks
+  ## Costs correspond to items (cols)
+  ## Priors correspond to semantics (rows)
+  if (length(costs) != ncol(m)) stop("Incorrect cost vector dimensions")
+  if (length(priors) != nrow(m)) stop("Incorrect priors vector dimensions")
 
   while(depth > 0) {
     m <- rsa.fullRecursion(m, costs, priors, alpha)
@@ -93,8 +95,8 @@ rsa.reason <- function(m, costs = m - m, priors = rep(1, nrow(m)), depth = 1, al
 #'
 rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), alpha = 1) {
   ## Validation checks
-  ## Costs correspond with itesm (cols)
-  ## Priors correspond with semantics (rows)
+  ## Costs correspond to items (cols)
+  ## Priors correspond to semantics (rows)
   if (length(costs) != ncol(m)) stop("Incorrect cost vector dimensions")
   if (length(priors) != nrow(m)) stop("Incorrect priors vector dimensions")
 
@@ -109,16 +111,16 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
 
   ## Likelihood (compute over rows) ------ :: p(u | m)
   likelihood <- t(mapply(rsa.utility, split(m, row(m)),
-                                       split(costsAsMatrix, row(costsAsMatrix)), alpha = alpha))
+                                      split(costsAsMatrix, row(costsAsMatrix)), alpha = alpha))
 
   ## Priors ------------------------------ :: p(u | m) * p(m)
   likelihood <- apply(likelihood, 2, function(i) priors * i)
 
-  # Normalization (compute over cols) --- :: [p(u | m) * p(m)] / (\sum_m p(m | u) * p(m))
+  # Normalization (compute over cols) ---- :: [p(u | m) * p(m)] / (\sum_m p(m | u) * p(m))
   posterior <- mapply(rsa.utility, split(likelihood, col(likelihood)),
                                    split(costsAsMatrix, col(costsAsMatrix)), alpha = alpha)
 
-  # Re-label
+  # Re-label matrix
   rownames(posterior) <- rNames
   colnames(posterior) <- cNames
 
@@ -136,7 +138,9 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
 #' @export
 #'
 rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
-  validateDims(items, costs)
+  ## Validation checks
+  if (length(items) != length(costs)) stop("Item and cost dimensions do not match")
+
   normVec(mapply(rsa.informativity, items, costs, alpha = alpha))
 }
 
@@ -155,6 +159,10 @@ rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
 #' rsa.informatitivy(0, 0, 0) == 0.0
 #'
 rsa.informativity <- function(m_u, alpha = 1, cost = 0) {
+  ## Validation checks
   if (m_u < 0 | m_u > 1) stop("Invalid semantic `m_u` value, must be between [0, 1]")
+  if (alpha < 0) stop("Invalid alpha, must be a positive numerical expression")
+
+  ## Watch for m_u == 0 in which case return 0
   ifelse(m_u == 0, 0, exp(-alpha * (-log(m_u) - cost)))
 }
