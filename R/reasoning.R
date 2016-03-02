@@ -42,6 +42,7 @@ rsa.batchRun <- function(data, alpha = 1, depth = 1) {
   merge(data$originalData, predDf)
 }
 
+
 #' Run (multiple) iterations RSA \code{rsa.fullRecursion()}
 #'
 #' Return matrix after undergoing 'depth' recursions
