@@ -22,42 +22,96 @@
 #' 0, 0.1, 0.15, 0.35, 0.40),
 #' listener.p = c(0, 0, 0, 0.15, 0.85,
 #' 0, 0.1, 0.25, 0.5, 0.15))
-#' convertData(d, group = "scales", quantity = "stars", item = "degrees", semantics = "speaker.p")
+#' processData(d, group = "scales", quantity = "stars", item = "degrees", semantics = "speaker.p")
 #'
-processData <- function(data, group, quantity, item, semantics) {
+rsa.processData <- function(data, group = NA, quantity, item, semantics) {
 
-  # save original data
+  ## save original data
   originalData <- data
-
-  # Verify valid data fields
+  ## get column names for data field verifications
   cols <- names(data)
-  if (!all(group %in% cols &&
-           quantity %in% cols &&
-           item %in% cols &&
-           semantics %in% cols)) {
-    stop("Data set is missing fields")
+
+  ## If group is NULL then proceed without grouping var
+  ## i.e. this would be the same as testing on scalar family
+  ## from Peloquin & Frank (2016)
+  if (is.na(group)) {
+#     # Verify valid data fields
+#     if (!all(quantity %in% cols &&
+#              item %in% cols &&
+#              semantics %in% cols)) {
+#       stop("Data set is missing fields")
+#     }
+#
+#     # Rename for serialization and maintain old names
+#     out <- renameRSACols(data, quantity, item, semantics)
+#
+  stop("group is NA")
   }
+  else {
+    # Verify valid data fields
+    if (!all(group %in% cols &&
+             quantity %in% cols &&
+             item %in% cols &&
+             semantics %in% cols)) {
+      stop("Data set is missing fields")
+    }
 
-  # Rename for serialization and maintain old names
-  out <- renameRSACols(data, group, quantity, item, semantics)
+    # Rename for serialization and maintain old names
+    out <- renameRSACols(data, group, quantity, item, semantics)
 
-  # Verify valid dimensions
-  # (currently assuming we have groupings)
-  groupings <- unique(data$group)
-  quantities <- unique(data$quantity)
-  items <- unique(data$item)
-  if (length(groupings) * length(quantities) * length(items) != length(data$semantics)) {
-    stop("Invalid data dimensions")
+    # Verify valid dimensions
+    # (currently assuming we have groupings)
+    groupings <- unique(data$group)
+    quantities <- unique(data$quantity)
+    items <- unique(data$item)
+    if (length(groupings) * length(quantities) * length(items) != length(data$semantics)) {
+      stop("Invalid data dimensions")
+    }
+
+    # Convert to semantics for (near) matrix representation
+    runData <- out[[1]] %>%
+      dplyr::select(group, quantity, item, semantics) %>%
+      dplyr::mutate(semantics = as.numeric(semantics)) %>%
+      tidyr::spread(item, semantics)
   }
-
-  # Convert to semantics for (near) matrix representation
-  runData <- out[[1]] %>%
-    dplyr::select(group, quantity, item, semantics) %>%
-    dplyr::mutate(semantics = as.numeric(semantics)) %>%
-    tidyr::spread(item, semantics)
-
   # Important labels here, used to validate data passed to later fns()
   list(runData = runData, labels = out[[2]], originalData = originalData)
+}
+debug(rsa.processData)
+rsa.processData(df, group = "scales", quantity = "stars", item = "degrees", semantics = "speaker.p")
+
+#' Rename group, quantity, item and semantics columns in user df for use in RSA
+#'
+#' @param df, data frame of measurements
+#' @param group, group name (e.g. "scales")
+#' @param quantity, quantity we're quantifying over (e.g. "stars")
+#' @param item, items we're examining (either individual words
+#' ("some", "all", or degrees, "weak", "strong))
+#' @param semantics, normalized compatibility measures
+#' @return, fill this out
+#' @seealso Called by \code{processData()}
+#' @keywords data_org
+#' @export
+#' @examples
+#' d <- data.frame(scales = rep("some_all", 10),
+#' stars = as.factor(rep(1:5, 2)),
+#' degrees = c(rep("strong", 5), rep("weak", 5)),
+#' speaker.p = c(0, 0, 0, 0.3, 0.7,
+#' 0, 0.1, 0.15, 0.35, 0.40),
+#' pragmatics = c(0, 0, 0, 0.15, 0.85,
+#' 0, 0.1, 0.25, 0.5, 0.15))
+#' newDf <- renameRSACols(d, group = "scales", quantity = "stars",
+#' item = "degrees", semantics = "speaker.p")
+#' newDf$data
+#' newDf$labels
+#'
+renameRSACols <- function(df, group, quantity, item, semantics) {
+  oldNames <- c(group = group, quantity = quantity, item = item, semantics = semantics)
+  names(df)[names(df) == group] <- "group"
+  names(df)[names(df) == quantity] <- "quantity"
+  names(df)[names(df) == item] <- "item"
+  names(df)[names(df) == semantics] <- "semantics"
+  list(data = df, labels = oldNames)
 }
 
 #' Validate data entries
@@ -136,40 +190,6 @@ convertMatrix2Df <- function(m, group) {
     dplyr::mutate(group = group,
                   quantity = rownames(.))
   df
-}
-
-#' Rename group, quantity, item and semantics columns in user df for use in RSA
-#'
-#' @param df, data frame of measurements
-#' @param group, group name (e.g. "scales")
-#' @param quantity, quantity we're quantifying over (e.g. "stars")
-#' @param item, items we're examining (either individual words
-#' ("some", "all", or degrees, "weak", "strong))
-#' @param semantics, normalized compatibility measures
-#' @return, fill this out
-#' @seealso Called by \code{processData()}
-#' @keywords data_org
-#' @export
-#' @examples
-#' d <- data.frame(scales = rep("some_all", 10),
-#' stars = as.factor(rep(1:5, 2)),
-#' degrees = c(rep("strong", 5), rep("weak", 5)),
-#' speaker.p = c(0, 0, 0, 0.3, 0.7,
-#' 0, 0.1, 0.15, 0.35, 0.40),
-#' pragmatics = c(0, 0, 0, 0.15, 0.85,
-#' 0, 0.1, 0.25, 0.5, 0.15))
-#' newDf <- renameRSACols(d, group = "scales", quantity = "stars",
-#' item = "degrees", semantics = "speaker.p")
-#' newDf$data
-#' newDf$labels
-#'
-renameRSACols <- function(df, group, quantity, item, semantics) {
-  oldNames <- c(group = group, quantity = quantity, item = item, semantics = semantics)
-  names(df)[names(df) == group] <- "group"
-  names(df)[names(df) == quantity] <- "quantity"
-  names(df)[names(df) == item] <- "item"
-  names(df)[names(df) == semantics] <- "semantics"
-  list(data = df, labels = oldNames)
 }
 
 #' Return to original names (before renameRSACols()) for output
