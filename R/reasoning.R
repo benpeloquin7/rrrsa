@@ -39,7 +39,7 @@ rsa.batchRun <- function(data, alpha = 1, depth = 1) {
     unnameRSACols(originalLabels = originalLabels)
 
   # Add predictions column and return original data
-  merge(data$originalData, predDf)
+  merge(data$originalData, removeNACols(predDf))
 }
 
 
