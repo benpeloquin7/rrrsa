@@ -1,3 +1,34 @@
+rsa.processDf <- function(data, group = NA, quantity, item, semantics) {
+
+  ## save original data
+  originalData <- data
+
+  ## If group is NULL then proceed without grouping var
+  ## i.e. this would be the same as testing on scalar family
+  ## from Peloquin & Frank (2016)
+  if (is.na(group)) data$group <- rep("__GROUP__", nrow(data))
+
+  ## get column names for data field verifications
+  cols <- names(data)
+
+  # Rename for serialization and maintain old names
+  out <- renameRSACols(data, group, quantity, item, semantics)
+
+  # Convert to semantics for (near) matrix representation
+  runData <- out[[1]] %>%
+    dplyr::select(group, quantity, item, semantics) %>%
+    dplyr::mutate(semantics = as.numeric(semantics)) %>%
+    tidyr::spread(item, semantics)
+  # Important labels here, used to validate data passed to later fns()
+  list(runData = runData, labels = out[[2]], originalData = originalData)
+}
+undebug(rsa.processDf)
+debug(rsa.processDf)
+pData <- rsa.processDf(df2, quantity = "stars", item = "words", semantics = "speaker.p")
+undebug(rsa.batchRun)
+debug(rsa.batchRun)
+rsa.batchRun(pData)
+
 #' Process data to correct structure for conversion to matrix for reasoning()
 #'
 #' Data should be passed in 'long' format with 4 required fields
@@ -223,6 +254,13 @@ unnameRSACols <- function(df, originalLabels) {
   names(newDf)[names(newDf) == "semantics"] <-
     originalLabels[[which(names(originalLabels) == "semantics")]]
   newDf
+}
+
+
+#' Remove columns named NA from data frame
+#'
+removeNACols <- function(df) {
+  df[, -which(is.na(colnames(df)))]
 }
 
 #' Normalize vectors
