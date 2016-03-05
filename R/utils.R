@@ -1,33 +1,36 @@
-rsa.processDf <- function(data, group = NA, quantity, item, semantics) {
+## expects tidied data with 5 cols (possibly group as well)
+rsa.runDf <- function(data,
+                      quantityVarName, semanticsVarName, itemVarName,
+                      costsVarName = NA, priorsVarName = NA) {
 
-  ## save original data
+  #! validation checks here
+
+  ## store original data
   originalData <- data
+  originalColNames <- names(data)
+  matrixLabels <- c(quantityVarName, semanticsVarName, itemVarName) # these must be present
+  # (and pass validation checks)
+  matrixIndices <- match(matrixLabels, names(data))
 
-  ## If group is NULL then proceed without grouping var
-  ## i.e. this would be the same as testing on scalar family
-  ## from Peloquin & Frank (2016)
-  if (is.na(group)) data$group <- rep("__GROUP__", nrow(data))
+  matrixData <- data %>%
+    select_(quantityVarName, semanticsVarName, itemVarName) %>%
+    spread_(itemVarName, semanticsVarName) %>%
+    select(-1) %>% # we know what quantity is going to be the first col
+    data.matrix()
 
-  ## get column names for data field verifications
-  cols <- names(data)
+  ## costs should of length of unique(itemVarName)
+  if (is.na(costsVarName)) costs <- rep(0, length(unique(data[, itemVarName])))
+  else costs <- rep(0, length(unique(data[, itemVarName]))) # need to fix this
+  #! validation check here
 
-  # Rename for serialization and maintain old names
-  out <- renameRSACols(data, group, quantity, item, semantics)
+  ## priors should of length of unique(quantityVarName)
+  if (is.na(priorsVarName)) priors <- rep(1, length(unique(data[, quantityVarName])))
+  else priors <- rep(1, length(unique(data[, quantityVarName]))) # need to fix this
 
-  # Convert to semantics for (near) matrix representation
-  runData <- out[[1]] %>%
-    dplyr::select(group, quantity, item, semantics) %>%
-    dplyr::mutate(semantics = as.numeric(semantics)) %>%
-    tidyr::spread(item, semantics)
-  # Important labels here, used to validate data passed to later fns()
-  list(runData = runData, labels = out[[2]], originalData = originalData)
+  #! validation check here
+
+  posteriors <- rsa.reason(matrixData, costs = costs, priors = priors)
 }
-undebug(rsa.processDf)
-debug(rsa.processDf)
-pData <- rsa.processDf(df2, quantity = "stars", item = "words", semantics = "speaker.p")
-undebug(rsa.batchRun)
-debug(rsa.batchRun)
-rsa.batchRun(pData)
 
 #' Process data to correct structure for conversion to matrix for reasoning()
 #'
