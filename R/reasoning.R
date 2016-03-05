@@ -117,11 +117,11 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
   ## Priors ------------------------------ :: p(u | m) * p(m)
   likelihood <- apply(likelihood, 2, function(i) priors * i)
 
-  # Normalization (compute over cols) ---- :: [p(u | m) * p(m)] / (\sum_m p(m | u) * p(m))
+  ## Normalization (compute over cols) ---- :: [p(u | m) * p(m)] / (\sum_m p(m | u) * p(m))
   posterior <- mapply(rsa.utility, split(likelihood, col(likelihood)),
                                    split(costsAsMatrix, col(costsAsMatrix)), alpha = alpha)
 
-  # Re-label matrix
+  ## Re-label matrix
   rownames(posterior) <- rNames
   colnames(posterior) <- cNames
 
