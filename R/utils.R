@@ -1,4 +1,23 @@
-## expects tidied data with 5 cols (possibly group as well)
+#' run RSA on a tidied data frame (assumes one group)
+#'
+#' Data should be passed in 'long' format with 4 required fields
+#' 1) quanityVarName :: entity name we're quantifying over
+#' (i.e. "stars" in Peloquin & Frank (2016))
+#' 2) item :: unique items were compring, probaby words
+#' 3) semantics ::
+#' @param data, data for running rsa
+#' @param quanityVarName, entity name we're quantifying over
+#' (i.e. "stars" in Peloquin & Frank (2016))
+#' @param itemVarName, unique items were compring, probaby words
+#' (i.e. "degrees" in Peloquin & Frank (2016))
+#' @param costsVarName, costs
+#' @param priorsVarName, priors
+#' @return, return data frame with 'pred' appended
+#' @keywords run function
+#' @importFrom magrittr "%>%"
+#' @export
+#' @examples
+#'
 rsa.runDf <- function(data,
                       quantityVarName, semanticsVarName, itemVarName,
                       costsVarName = NA, priorsVarName = NA) {
@@ -13,9 +32,9 @@ rsa.runDf <- function(data,
   matrixIndices <- match(matrixLabels, names(data))
 
   matrixData <- data %>%
-    select_(quantityVarName, semanticsVarName, itemVarName) %>%
-    spread_(itemVarName, semanticsVarName) %>%
-    select(-1) %>% # we know what quantity is going to be the first col from select_
+    dplyr::select_(quantityVarName, semanticsVarName, itemVarName) %>%
+    tidyr::spread_(itemVarName, semanticsVarName) %>%
+    dplyr::select(-1) %>% # we know what quantity is going to be the first col from select_
     data.matrix()
 
   ## costs should of length of unique(itemVarName)
@@ -34,8 +53,8 @@ rsa.runDf <- function(data,
 
   ## tidy data
   tidyPosterior<- data.frame(posteriors) %>%
-    mutate(quantityVarName = rownames(.)) %>%
-    gather(itemVarName, "preds", -quantityVarName)
+    dplyr::mutate(quantityVarName = rownames(.)) %>%
+    tidyr::gather(itemVarName, "preds", -quantityVarName)
 
   ## rename columns lost during dplyr
   renamedDf <- tidyPosterior %>%
