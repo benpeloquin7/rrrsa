@@ -15,7 +15,7 @@ rsa.runDf <- function(data,
   matrixData <- data %>%
     select_(quantityVarName, semanticsVarName, itemVarName) %>%
     spread_(itemVarName, semanticsVarName) %>%
-    select(-1) %>% # we know what quantity is going to be the first col
+    select(-1) %>% # we know what quantity is going to be the first col from select_
     data.matrix()
 
   ## costs should of length of unique(itemVarName)
@@ -29,7 +29,21 @@ rsa.runDf <- function(data,
 
   #! validation check here
 
+  ## run rsa to compuate posteriors
   posteriors <- rsa.reason(matrixData, costs = costs, priors = priors)
+
+  ## tidy data
+  tidyPosterior<- data.frame(posteriors) %>%
+    mutate(quantityVarName = rownames(.)) %>%
+    gather(itemVarName, "preds", -quantityVarName)
+
+  ## rename columns lost during dplyr
+  renamedDf <- tidyPosterior %>%
+    rsa.renameCol(c("quantityVarName", "itemVarName"),
+                  c(quantityVarName, itemVarName))
+
+  mergedData <- left_join(originalData, renamedDf)
+  mergedData
 }
 
 #' Process data to correct structure for conversion to matrix for reasoning()
@@ -219,10 +233,8 @@ convertDf2Matrix <- function(df) {
 #' convertMatrix2Df(mData)
 #'
 convertMatrix2Df <- function(m, group) {
-  quantity <-
-    df <- as.data.frame(m) %>%
-    dplyr::mutate(group = group,
-                  quantity = rownames(.))
+  df <- as.data.frame(m) %>%
+    dplyr::mutate(group = group, quantity = rownames(.))
   df
 }
 
