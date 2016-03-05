@@ -295,3 +295,21 @@ normVec <- function(v) {
   if (normalizer == 0) rep(0, length(v))
   else (v / normalizer)
 }
+
+#' Rename df columns avoiding NSE problems
+#'
+#' return a data frame with columns change
+#' (if they exist in the df passed in)
+#' @param df, data frame to change names
+#' @param currNames, character names we want to replace
+#' @param replacements, values used as replacements
+#' @return, NA
+#' @keywords data processing
+#' @examples
+#' print("make an example here")
+#'
+rsa.renameCol <- function(df, currNames, replacements) {
+  indices <- which(names(df) %in% currNames)
+  names(df)[indices] <- replacements[indices]
+  df
+}
