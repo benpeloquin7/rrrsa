@@ -1,48 +1,3 @@
-#' Run RSA model on processed data
-#'
-#' Only accepts processed data as from processData()
-#' @param data, data passed after call to \code{processData()}
-#' @param alpha, alpha parameter
-#' @param depth, depth of recursion
-#' @return, fill this out
-#' @keywords main
-#' @export
-#' @examples
-#' print("not yet implemented")
-#'
-rsa.batchRun <- function(data, alpha = 1, depth = 1) {
-  # ------- Data verification checks here ------- #
-  # ------- Data verification checks here ------- #
-
-  # Prep data subgroups
-  runData <- data$runData
-  originalData <- data$orginalData
-  groups <- unique(runData$group)
-  originalLabels <- data$labels
-
-  # predictions DF for rsa
-  preds <- data.frame()
-  for (g in groups) {
-    # convert to matrix
-    mData <- runData %>%
-      dplyr::filter(group == g) %>%
-      convertDf2Matrix()
-
-    # Run rsa (currently not handling costs)
-    modelPreds <- rsa.reason(m = mData, depth = depth, alpha = alpha) %>%
-      convertMatrix2Df(., group = g)
-
-    preds <- rbind(preds, modelPreds)
-  }
-  predDf <- preds %>%
-    tidyr::gather(key = item, value = modelPreds, -c(group, quantity)) %>%
-    unnameRSACols(originalLabels = originalLabels)
-
-  # Add predictions column and return original data
-  merge(data$originalData, removeNACols(predDf))
-}
-
-
 #' Run (multiple) iterations RSA \code{rsa.fullRecursion()}
 #'
 #' Return matrix after undergoing 'depth' recursions
@@ -107,8 +62,9 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
 
   ## Costs as matrix for easy use of mapply
   costsAsMatrix <- matrix(rep(costs, times = 1, each = nrow(m)), nrow = nrow(m))
+  colnames(costsAsMatrix) <- names(costs) # get names
+  costsAsMatrix <- costsAsMatrix[ , cNames] # IMPORTANT: maintain col ordering with 'm'
   rownames(costsAsMatrix) <- rNames
-  colnames(costsAsMatrix) <- cNames
 
   ## Likelihood (compute over rows) ------ :: p(u | m)
   likelihood <- t(mapply(rsa.utility, split(m, row(m)),
