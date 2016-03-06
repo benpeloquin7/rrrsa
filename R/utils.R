@@ -47,9 +47,11 @@ rsa.runDf <- function(data,
   ## costs data
   ## ----------
   ## 1) assume uniform costs (0) if not present in data set
-  if (is.na(costsVarName)) costs <-
-    rep(0, length(unique(data[, itemVarName])))
-  ## 2) else create new named vector
+  if (is.na(costsVarName)) {
+    costs <- rep(0, length(unique(data[, itemVarName])))
+    names(costs) <- unique(data[, itemVarName])
+  }
+  ## 2) else create new (named) vector
   else {
     costsData <- data %>%
       select_(itemVarName, costsVarName) %>%
@@ -62,7 +64,11 @@ rsa.runDf <- function(data,
   ## priors data
   ## ------------
   ## 1) assume uniform (0) priors if not present in data set
-  if (is.na(priorsVarName)) priors <- rep(1, length(unique(data[, quantityVarName])))
+  if (is.na(priorsVarName)) {
+    priors <- rep(1, length(unique(data[, quantityVarName])))
+    names(priors) <- unique(data[, quantityVarName])
+  }
+  # 2) else create new (named) priors vector
   else {
     priorsData <- data %>%
       select_(quantityVarName, priorsVarName) %>%
