@@ -1,3 +1,32 @@
+
+#' Tune depth and alpha
+#'
+rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarName, groupName = NA, compareDataName,
+                               costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1,
+                               verbose = FALSE) {
+
+  cors <- list()
+  ## running multiple groups
+  if (!is.na(groupName)) {
+    for (a in alphas) {
+      for (d in depths) {
+        currRun <- plyr::ddply(data, .fun = rsa.runDf, .variables = c(groupName),
+                               quantityVarName = quantityVarName,
+                               semanticsVarName = semanticsVarName,
+                               itemVarName = itemVarName,
+                               costsVarName = costsVarName,
+                               priorsVarName = priorsVarName,
+                               depth = d, alpha = a)
+        cors <- list(cors, c(cor = cor(currRun[, compareDataName],
+                                       currRun[, "preds"]), depth = d, alpha = a))
+      }
+    }
+  }
+  cors
+}
+
+
+
 #' Run (multiple) iterations RSA \code{rsa.fullRecursion()}
 #' --------------------------------------------------------
 #'
