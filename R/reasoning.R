@@ -1,9 +1,10 @@
 #' Run (multiple) iterations RSA \code{rsa.fullRecursion()}
+#' --------------------------------------------------------
 #'
-#' Return matrix after undergoing 'depth' recursions
-#' @param m, matrix of semantics
+#' Return matrix after undergoing number 'depth' recursions
+#' @param m, matrix of semantics with 'items' cols and 'quantity' rows
 #' @param costs, length m vector of costs (default is 0 valued vector)
-#' @param priors, default uniform, vector of length nrow() [semantic quantity]
+#' @param priors, default uniform, vector of length nrow() (semantic quantity)
 #' @param depth, number of recursions
 #' @param alpha, decision hyper-parameter
 #' @return, return a matrix of posteriors
@@ -16,11 +17,13 @@
 #' rsa.reason(m, 0)
 #' rsa.reason(m, 2)
 #' priors <- c(0.1, 0.1, 0.1, 0.1, 0.6)
+#'
 rsa.reason <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), depth = 1, alpha = 1) {
   ## Validation checks
-  ## Costs correspond to items (cols)
-  ## Priors correspond to semantics (rows)
+  ## ------------------
+  ## costs correspond to items (cols)
   if (length(costs) != ncol(m)) stop("Incorrect cost vector dimensions")
+  ## priors correspond to semantics (rows)
   if (length(priors) != nrow(m)) stop("Incorrect priors vector dimensions")
 
   while(depth > 0) {
@@ -31,6 +34,7 @@ rsa.reason <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), dep
 }
 
 #' Run one full recursion between listener -> speaker -> listener
+#' --------------------------------------------------------------
 #'
 #' @param m, matrix of semantics (rows = meaning (m rows), cols = words (n cols))
 #' @param costs, length m vector of costs (default is 0 valued vector)
@@ -51,33 +55,34 @@ rsa.reason <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), dep
 #'
 rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), alpha = 1) {
   ## Validation checks
-  ## Costs correspond to items (cols)
-  ## Priors correspond to semantics (rows)
+  ## -----------------
+  ## costs correspond to items (cols)
   if (length(costs) != ncol(m)) stop("Incorrect cost vector dimensions")
+  ## priors correspond to semantics (rows)
   if (length(priors) != nrow(m)) stop("Incorrect priors vector dimensions")
 
-  ## Store matrix naming labels
+  ## store matrix naming labels
   rNames <- rownames(m)
   cNames <- colnames(m)
 
-  ## Costs as matrix for easy use of mapply
+  ## costs as matrix for easy use of mapply
   costsAsMatrix <- matrix(rep(costs, times = 1, each = nrow(m)), nrow = nrow(m))
-  colnames(costsAsMatrix) <- names(costs) # get names
-  costsAsMatrix <- costsAsMatrix[ , cNames] # IMPORTANT: maintain col ordering with 'm'
-  rownames(costsAsMatrix) <- rNames
+  colnames(costsAsMatrix) <- names(costs)   #! get names
+  costsAsMatrix <- costsAsMatrix[ , cNames] #! IMPORTANT: maintain col ordering with 'm'
+  rownames(costsAsMatrix) <- rNames         #! assign rownames, don't lose this data
 
-  ## Likelihood (compute over rows) ------ :: p(u | m)
+  ## likelihood (compute over rows) ------ :: p(u | m)
   likelihood <- t(mapply(rsa.utility, split(m, row(m)),
                                       split(costsAsMatrix, row(costsAsMatrix)), alpha = alpha))
 
-  ## Priors ------------------------------ :: p(u | m) * p(m)
+  ## priors ------------------------------ :: p(u | m) * p(m)
   likelihood <- apply(likelihood, 2, function(i) priors * i)
 
-  ## Normalization (compute over cols) ---- :: [p(u | m) * p(m)] / (\sum_m p(m | u) * p(m))
+  ## normalization (compute over cols) --- :: [p(u | m) * p(m)] / (\sum_m p(m | u) * p(m))
   posterior <- mapply(rsa.utility, split(likelihood, col(likelihood)),
                                    split(costsAsMatrix, col(costsAsMatrix)), alpha = alpha)
 
-  ## Re-label matrix
+  ## re-label matrix
   rownames(posterior) <- rNames
   colnames(posterior) <- cNames
 
@@ -85,23 +90,25 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
 }
 
 #' RSA utility
+#' -----------
 #'
 #' Return normalized utility for a vector
 #' @param items, literal semantic input vector <m_u1, m_u2, ...>
 #' or <m1_u, m2_u,...>
-#' @param alpha, decision nose parameter (see 'informativity()')
+#' @param alpha, decision noise parameter (see 'informativity()')
 #' @param cost, cost vector <u1, u2, ...>
-#' @return, fill this out
+#' @return, return a vector of utilities
 #' @export
 #'
 rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
   ## Validation checks
   if (length(items) != length(costs)) stop("Item and cost dimensions do not match")
 
-  normVec(mapply(rsa.informativity, items, costs, alpha = alpha))
+  rsa.normVec(mapply(rsa.informativity, items, costs, alpha = alpha))
 }
 
 #' RSA Informativity
+#' -----------------
 #'
 #' e^(-alpha * (-log(p(m|u)) - cost))
 #' @param m_u, literal semantics of meaning given utterance
@@ -117,6 +124,7 @@ rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
 #'
 rsa.informativity <- function(m_u, alpha = 1, cost = 0) {
   ## Validation checks
+  ## -----------------
   if (m_u < 0 | m_u > 1) stop("Invalid semantic `m_u` value, must be between [0, 1]")
   if (alpha < 0) stop("Invalid alpha, must be a positive numerical expression")
 

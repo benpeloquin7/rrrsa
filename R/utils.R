@@ -1,19 +1,21 @@
-#' run RSA on a tidied data frame (assumes one group)
+#' Run RSA on a tidied data frame (assumes one group)
 #' --------------------------------------------------
-#' Data should be passed in 'long' format with 4 required fields
-#' 1) quanityVarName :: entity name we're quantifying over
-#' (i.e. "stars" in Peloquin & Frank (2016))
-#' 2) item :: unique items were compring, probaby words
-#' 3) semantics ::
-#' @param data, data for running rsa
+#'
+#' Expects tidied data with three required and two optional fields
+#' 1) quanityVarName         :: entity name we're quantifying over
+#' 2) itemVarName            :: unique items were considering,
+#' 3) semanticsVarName       :: literal listener semantics
+#' 4) optional costsVarName  :: costs
+#' 5) optional priorsVarName :: priors
+#' @param data, tidied data
 #' @param quanityVarName, entity name we're quantifying over
 #' (i.e. "stars" in Peloquin & Frank (2016))
 #' @param itemVarName, unique items were compring, probaby words
 #' (i.e. "degrees" in Peloquin & Frank (2016))
 #' @param costsVarName, costs variable name
 #' @param priorsVarName, priors variable name
-#' @return, return data frame with 'pred' appended
-#' @keywords run function
+#' @return, return data frame with 'pred' col appended
+#' @keywords primary run functionality
 #' @importFrom magrittr "%>%"
 #' @export
 #' @examples
@@ -24,16 +26,17 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
 
   ## initial data processing
   ## -----------------------
-  originalData <- data
-  originalColNames <- names(data)
-  matrixLabels <- c(quantityVarName, semanticsVarName, itemVarName) #! these must be present
-  matrixIndices <- match(matrixLabels, names(data))
+  originalData <- data                #! save original data
+  matrixLabels <- c(quantityVarName,  #! three required fields
+                    semanticsVarName,
+                    itemVarName)
 
   ## semantics data
   ## --------------
-  ## cols = items (words),
-  ## rows = quantities (stars),
-  ## values = semantics (L0 probs)
+  ## Matrix info ->
+  ##   cols = items (words),
+  ##   rows = quantities (stars),
+  ##   values = semantics (L0 probs)
   matrixData <- data %>%
     dplyr::select_(quantityVarName, semanticsVarName,
                    itemVarName) %>%
@@ -62,12 +65,12 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
 
   ## priors data
   ## ------------
-  ## 1) assume uniform (0) priors if not present in data set
+  ## 1) assume uniform (1) priors if not present in data set
   if (is.na(priorsVarName)) {
     priors <- rep(1, length(unique(data[, quantityVarName])))
     names(priors) <- unique(data[, quantityVarName])
   }
-  # 2) else create new (named) priors vector
+  ## 2) else create new (named) priors vector
   else {
     priorsData <- data %>%
       select_(quantityVarName, priorsVarName) %>%
@@ -78,13 +81,12 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
   }
   #! priors validation check here
 
-  ## run rsa to compuate posteriors
+  ## run rsa, compute posteriors
   posteriors <- rsa.reason(matrixData, costs = costs, priors = priors)
 
   ## tidy data
   tidyPosterior<- data.frame(posteriors) %>%
-    dplyr::mutate(quantityVarName = rownames(.)) %>% #! add back quantity
-                                                     #! (stored in rows from rsa.reason())
+    dplyr::mutate(quantityVarName = rownames(.)) %>% #! add back quantity (stored in rownames)
     tidyr::gather(itemVarName, "preds", -quantityVarName)
 
   ## rename columns lost during dplyr
@@ -99,15 +101,16 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
 
 #' Rename df columns avoiding NSE problems
 #' ---------------------------------------
-#' return a data frame with columns change
+#'
+#' return a data frame with columns renamed
 #' (if they exist in the df passed in)
-#' @param df, data frame to change names
-#' @param currNames, character names we want to replace
+#' @param df, data frame to change col names
+#' @param currNames, names we want to replace (passed as characters)
 #' @param replacements, values used as replacements
-#' @return, NA
+#' @return data frame with changed col names
 #' @keywords data processing
 #' @examples
-#' print("make an example here")
+#' NA
 #'
 rsa.renameCol <- function(df, currNames, replacements) {
   indices <- which(names(df) %in% currNames)
@@ -115,26 +118,20 @@ rsa.renameCol <- function(df, currNames, replacements) {
   df
 }
 
-#' Remove columns named NA from data frame
-#' --------------------------------------
-#'
-rsa.removeNACols <- function(df) {
-  df[, -which(is.na(colnames(df)))]
-}
-
 #' Normalize vectors
 #' -----------------
+#'
 #' Return a normalized vector
 #' @param v, vector to be normalized
-#' @return, fill this out
-#' @keywords normalization
+#' @return, normalized vector
+#' @keywords data processing
 #' @examples
 #' vec1 <- c(1, 1, 1)
-#' norm(vec1)
+#' normVec(vec1)
 #' vec2 <- c(0, 0, 0, 0)
-#' norm(vec2)
+#' normVec(vec2)
 #'
-normVec <- function(v) {
+rsa.normVec <- function(v) {
   normalizer = sum(v)
   if (normalizer == 0) rep(0, length(v))
   else (v / normalizer)
