@@ -148,6 +148,9 @@ rsa.normVec <- function(v) {
 
 #' Convert vector data type
 #'
+#' @param vec1, first vector with type we want to match
+#' @param vec2, second vector with type we'd like to transform
+#' @return vec2 with type matched to vec1
 #'
 rsa.convertVecType<- function(vec1, vec2) {
   if (typeof(vec1) == typeof(vec2)) vec2
