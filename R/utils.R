@@ -21,52 +21,68 @@
 rsa.runDf <- function(data,
                       quantityVarName, semanticsVarName, itemVarName,
                       costsVarName = NA, priorsVarName = NA) {
-
   #! validation checks here
 
-  ## store original data
+  ## initial data processing
+  ## -----------------------
   originalData <- data
   originalColNames <- names(data)
   matrixLabels <- c(quantityVarName, semanticsVarName, itemVarName) # these must be present
-  # (and pass validation checks)
+                                                                    # (and pass validation checks)
   matrixIndices <- match(matrixLabels, names(data))
 
+  ## semantics data
+  ## --------------
+  ## cols = items (words),
+  ## rows = quantities (stars),
+  ## values = semantics (L0 probs)
   matrixData <- data %>%
     dplyr::select_(quantityVarName, semanticsVarName, itemVarName) %>%
     tidyr::spread_(itemVarName, semanticsVarName) %>%
     dplyr::select(-1) %>% # quantity stored in first col from dplyr::select_ call
     data.matrix()
 
-  ## costs should of length of unique(itemVarName)
+  ## costs data
+  ## ----------
+  ## 1) assume uniform costs (0) if not present in data set
   if (is.na(costsVarName)) costs <- rep(0, length(unique(data[, itemVarName])))
+  ## 2) else create new named vector
   else {
     costsData <- data %>%
       select_(itemVarName, costsVarName) %>%
       unique()
-    costs <- costsData[ , costsVarName]
-    names(costs) <- costsData[ , itemVarName]
+    costs <- costsData[, costsVarName]
+    names(costs) <- costsData[, itemVarName]
   }
-  #! validation check here
+  #! costs validation check here
 
-  ## priors should of length of unique(quantityVarName)
+  ## priors data
+  ## ------------
+  ## 1) assume uniform (0) priors if not present in data set
   if (is.na(priorsVarName)) priors <- rep(1, length(unique(data[, quantityVarName])))
-  else priors <- rep(1, length(unique(data[, quantityVarName]))) # need to fix this
-
-  #! validation check here
+  else {
+    priorsData <- data %>%
+      select_(quantityVarName, priorsVarName) %>%
+      unique()
+    priors <- priorsData[, priorsVarName]
+    names(priors) <- priorsData[, quantityVarName]
+  }
+  #! priors validation check here
 
   ## run rsa to compuate posteriors
   posteriors <- rsa.reason(matrixData, costs = costs, priors = priors)
 
   ## tidy data
   tidyPosterior<- data.frame(posteriors) %>%
-    dplyr::mutate(quantityVarName = rownames(.)) %>%
-    tidyr::gather(itemVarName, "preds", -quantityVarName)
+    dplyr::mutate(quantityVarName = rownames(.)) %>%      # add back quantity
+    tidyr::gather(itemVarName, "preds", -quantityVarName) # tidy (quantity set to row names)
 
   ## rename columns lost during dplyr
   renamedDf <- tidyPosterior %>%
     rsa.renameCol(c("quantityVarName", "itemVarName"),
                   c(quantityVarName, itemVarName))
 
+  ## join with original data set
   mergedData <- left_join(originalData, renamedDf)
   mergedData
 }
