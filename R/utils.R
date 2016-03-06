@@ -10,16 +10,15 @@
 #' (i.e. "stars" in Peloquin & Frank (2016))
 #' @param itemVarName, unique items were compring, probaby words
 #' (i.e. "degrees" in Peloquin & Frank (2016))
-#' @param costsVarName, costs
-#' @param priorsVarName, priors
+#' @param costsVarName, costs variable name
+#' @param priorsVarName, priors variable name
 #' @return, return data frame with 'pred' appended
 #' @keywords run function
 #' @importFrom magrittr "%>%"
 #' @export
 #' @examples
 #'
-rsa.runDf <- function(data,
-                      quantityVarName, semanticsVarName, itemVarName,
+rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
                       costsVarName = NA, priorsVarName = NA) {
   #! validation checks here
 
@@ -84,7 +83,8 @@ rsa.runDf <- function(data,
 
   ## tidy data
   tidyPosterior<- data.frame(posteriors) %>%
-    dplyr::mutate(quantityVarName = rownames(.)) %>% #! add back quantity (stored in rows)
+    dplyr::mutate(quantityVarName = rownames(.)) %>% #! add back quantity
+                                                     #! (stored in rows from rsa.reason())
     tidyr::gather(itemVarName, "preds", -quantityVarName)
 
   ## rename columns lost during dplyr
