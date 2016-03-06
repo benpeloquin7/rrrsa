@@ -56,7 +56,7 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
   ## 2) else create new (named) vector
   else {
     costsData <- data %>%
-      select_(itemVarName, costsVarName) %>%
+      dplyr::select_(itemVarName, costsVarName) %>%
       unique()
     costs <- costsData[, costsVarName]
     names(costs) <- costsData[, itemVarName]
@@ -73,7 +73,7 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
   ## 2) else create new (named) priors vector
   else {
     priorsData <- data %>%
-      select_(quantityVarName, priorsVarName) %>%
+      dplyr::select_(quantityVarName, priorsVarName) %>%
       unique()
     priors <- priorsData[, priorsVarName]
     names(priors) <- priorsData[, quantityVarName]
