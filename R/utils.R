@@ -21,7 +21,7 @@
 #' @examples
 #'
 rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
-                      costsVarName = NA, priorsVarName = NA) {
+                      costsVarName = NA, priorsVarName = NA, depth = 1, alpha = 1) {
   #! validation checks here
 
   ## initial data processing
@@ -82,17 +82,26 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
   #! priors validation check here
 
   ## run rsa, compute posteriors
-  posteriors <- rsa.reason(matrixData, costs = costs, priors = priors)
+  posteriors <- rsa.reason(matrixData, depth = depth, alpha = alpha, costs = costs, priors = priors)
 
   ## tidy data
   tidyPosterior<- data.frame(posteriors) %>%
     dplyr::mutate(quantityVarName = rownames(.)) %>% #! add back quantity (stored in rownames)
     tidyr::gather(itemVarName, "preds", -quantityVarName)
 
+
+  ## ensure col type matching before merge
+  tidyPosterior[,"quantityVarName"] <- rsa.convertVecType(originalData[, quantityVarName],
+                                                          tidyPosterior[, "quantityVarName"])
+  tidyPosterior[,"itemVarName"] <- rsa.convertVecType(originalData[, itemVarName],
+                                                          tidyPosterior[, "itemVarName"])
+
   ## rename columns lost during dplyr
   renamedDf <- tidyPosterior %>%
     rsa.renameCol(c("quantityVarName", "itemVarName"),
                   c(quantityVarName, itemVarName))
+
+
 
   ## join with original data set
   mergedData <- left_join(originalData, renamedDf)
@@ -135,4 +144,15 @@ rsa.normVec <- function(v) {
   normalizer = sum(v)
   if (normalizer == 0) rep(0, length(v))
   else (v / normalizer)
+}
+
+#' Convert vector data type
+#'
+#'
+rsa.convertVecType<- function(vec1, vec2) {
+  if (typeof(vec1) == typeof(vec2)) vec2
+  else if (is.numeric(vec1)) as.numeric(vec2)
+  else if (is.factor(vec1)) as.factor(vec2)
+  else if (is.character(vec1)) as.character(vec2)
+  else vec2
 }
