@@ -34,12 +34,18 @@ rsa.runDf <- function(data,
   matrixData <- data %>%
     dplyr::select_(quantityVarName, semanticsVarName, itemVarName) %>%
     tidyr::spread_(itemVarName, semanticsVarName) %>%
-    dplyr::select(-1) %>% # we know what quantity is going to be the first col from select_
+    dplyr::select(-1) %>% # quantity stored in first col from dplyr::select_ call
     data.matrix()
 
   ## costs should of length of unique(itemVarName)
   if (is.na(costsVarName)) costs <- rep(0, length(unique(data[, itemVarName])))
-  else costs <- rep(0, length(unique(data[, itemVarName]))) # need to fix this
+  else {
+    costsData <- data %>%
+      select_(itemVarName, costsVarName) %>%
+      unique()
+    costs <- costsData[ , costsVarName]
+    names(costs) <- costsData[ , itemVarName]
+  }
   #! validation check here
 
   ## priors should of length of unique(quantityVarName)
