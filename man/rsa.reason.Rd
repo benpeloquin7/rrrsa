@@ -2,28 +2,28 @@
 % Please edit documentation in R/reasoning.R
 \name{rsa.reason}
 \alias{rsa.reason}
-\title{Run (multiple) iterations RSA \code{rsa.fullRecursion()}}
+\title{Run (multiple) iterations RSA \code{rsa.fullRecursion()}
+--------------------------------------------------------}
 \usage{
-rsa.reason(m, costs = m - m, priors = rep(1, nrow(m)), depth = 1,
-  alpha = 1)
+rsa.reason(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)),
+  depth = 1, alpha = 1)
 }
 \arguments{
-\item{m, }{matrix of semantics}
+\item{m, }{matrix of semantics with 'items' cols and 'quantity' rows}
 
-\item{costs, }{cost matrix dimensions identical to semantic matrix}
+\item{costs, }{length m vector of costs (default is 0 valued vector)}
 
-\item{priors, }{prior vector same length as nrow(m)}
+\item{priors, }{default uniform, vector of length nrow() (semantic quantity)}
 
 \item{depth, }{number of recursions}
 
-\item{alpha, }{decision hyper-param}
+\item{alpha, }{decision hyper-parameter}
 }
 \value{
-, fill this out
+, return a matrix of posteriors
 }
 \description{
-Return matrix after undergoing 'depth' recursions
-calling 'fn' for computation
+Return matrix after undergoing number 'depth' recursions
 }
 \examples{
 m <- matrix(data = c(0, 0.2, 0.25, 0.25, 0.3, 0, 0, 0, 0.3, 0.7), nrow = 5)
@@ -32,6 +32,7 @@ colnames(m) <- c("item1", "item2")
 rsa.reason(m, 0)
 rsa.reason(m, 2)
 priors <- c(0.1, 0.1, 0.1, 0.1, 0.6)
+
 }
 \keyword{recursion}
 

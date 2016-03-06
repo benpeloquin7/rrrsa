@@ -2,7 +2,8 @@
 % Please edit documentation in R/reasoning.R
 \name{rsa.utility}
 \alias{rsa.utility}
-\title{RSA utility}
+\title{RSA utility
+-----------}
 \usage{
 rsa.utility(items, costs = rep(0, length(items)), alpha = 1)
 }
@@ -10,12 +11,12 @@ rsa.utility(items, costs = rep(0, length(items)), alpha = 1)
 \item{items, }{literal semantic input vector <m_u1, m_u2, ...>
 or <m1_u, m2_u,...>}
 
-\item{alpha, }{decision nose parameter (see 'informativity()')}
+\item{alpha, }{decision noise parameter (see 'informativity()')}
 
 \item{cost, }{cost vector <u1, u2, ...>}
 }
 \value{
-, fill this out
+, return a vector of utilities
 }
 \description{
 Return normalized utility for a vector
