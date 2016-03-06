@@ -27,8 +27,7 @@ rsa.runDf <- function(data,
   ## -----------------------
   originalData <- data
   originalColNames <- names(data)
-  matrixLabels <- c(quantityVarName, semanticsVarName, itemVarName) # these must be present
-                                                                    # (and pass validation checks)
+  matrixLabels <- c(quantityVarName, semanticsVarName, itemVarName) #! these must be present
   matrixIndices <- match(matrixLabels, names(data))
 
   ## semantics data
@@ -37,15 +36,19 @@ rsa.runDf <- function(data,
   ## rows = quantities (stars),
   ## values = semantics (L0 probs)
   matrixData <- data %>%
-    dplyr::select_(quantityVarName, semanticsVarName, itemVarName) %>%
-    tidyr::spread_(itemVarName, semanticsVarName) %>%
-    dplyr::select(-1) %>% # quantity stored in first col from dplyr::select_ call
+    dplyr::select_(quantityVarName, semanticsVarName,
+                   itemVarName) %>%
+    tidyr::spread_(itemVarName, semanticsVarName)
+  rownames(matrixData) <- matrixData[, quantityVarName] #! save names to rows
+  matrixData <- matrixData %>%
+    dplyr::select(-1) %>%
     data.matrix()
 
   ## costs data
   ## ----------
   ## 1) assume uniform costs (0) if not present in data set
-  if (is.na(costsVarName)) costs <- rep(0, length(unique(data[, itemVarName])))
+  if (is.na(costsVarName)) costs <-
+    rep(0, length(unique(data[, itemVarName])))
   ## 2) else create new named vector
   else {
     costsData <- data %>%
@@ -66,6 +69,7 @@ rsa.runDf <- function(data,
       unique()
     priors <- priorsData[, priorsVarName]
     names(priors) <- priorsData[, quantityVarName]
+    quantityVec <- priorsData[, quantityVarName] #! store this to repopulate during tyding
   }
   #! priors validation check here
 
@@ -74,8 +78,8 @@ rsa.runDf <- function(data,
 
   ## tidy data
   tidyPosterior<- data.frame(posteriors) %>%
-    dplyr::mutate(quantityVarName = rownames(.)) %>%      # add back quantity
-    tidyr::gather(itemVarName, "preds", -quantityVarName) # tidy (quantity set to row names)
+    dplyr::mutate(quantityVarName = rownames(.)) %>% #! add back quantity (stored in rows)
+    tidyr::gather(itemVarName, "preds", -quantityVarName)
 
   ## rename columns lost during dplyr
   renamedDf <- tidyPosterior %>%
