@@ -27,8 +27,7 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
 
 
 
-#' Run (multiple) iterations RSA \code{rsa.fullRecursion()}
-#' --------------------------------------------------------
+#' Run (multiple) iterations RSA
 #'
 #' Return matrix after undergoing number 'depth' recursions
 #' @param m, matrix of semantics with 'items' cols and 'quantity' rows
@@ -36,7 +35,7 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
 #' @param priors, default uniform, vector of length nrow() (semantic quantity)
 #' @param depth, number of recursions
 #' @param alpha, decision hyper-parameter
-#' @return, return a matrix of posteriors
+#' @return return a matrix of posteriors
 #' @keywords recursion
 #' @export
 #' @examples
@@ -63,13 +62,12 @@ rsa.reason <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), dep
 }
 
 #' Run one full recursion between listener -> speaker -> listener
-#' --------------------------------------------------------------
 #'
 #' @param m, matrix of semantics (rows = meaning (m rows), cols = words (n cols))
 #' @param costs, length m vector of costs (default is 0 valued vector)
 #' @param priors, default uniform, vector of length nrow() [semantic quantity]
 #' @param alpha, decision hyper-param
-#' @return, fill this out
+#' @return fill this out
 #' @keywords recursion
 #' @export
 #' @examples
@@ -119,14 +117,13 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
 }
 
 #' RSA utility
-#' -----------
 #'
 #' Return normalized utility for a vector
 #' @param items, literal semantic input vector <m_u1, m_u2, ...>
 #' or <m1_u, m2_u,...>
 #' @param alpha, decision noise parameter (see 'informativity()')
 #' @param cost, cost vector <u1, u2, ...>
-#' @return, return a vector of utilities
+#' @return return a vector of utilities
 #' @export
 #'
 rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
@@ -137,7 +134,6 @@ rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
 }
 
 #' RSA Informativity
-#' -----------------
 #'
 #' e^(-alpha * (-log(p(m|u)) - cost))
 #' @param m_u, literal semantics of meaning given utterance
