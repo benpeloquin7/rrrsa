@@ -122,9 +122,10 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
 
   ## costs as matrix for easy use of mapply
   costsAsMatrix <- matrix(rep(costs, times = 1, each = nrow(m)), nrow = nrow(m))
-  colnames(costsAsMatrix) <- names(costs)   #! get names
-  costsAsMatrix <- costsAsMatrix[ , cNames] #! IMPORTANT: maintain col ordering with 'm'
-  rownames(costsAsMatrix) <- rNames         #! assign rownames, don't lose this data
+  if (is.null(names(costs))) colnames(costsAsMatrix) <- cNames  #! name cols
+  else colnames(costsAsMatrix) <- names(costs)
+  costsAsMatrix <- costsAsMatrix[ , cNames]                     #! IMPORTANT: maintain col ordering with 'm'
+  rownames(costsAsMatrix) <- rNames                             #! assign rownames, don't lose this data
 
   ## likelihood (compute over rows) ------ :: p(u | m)
   likelihood <- t(mapply(rsa.utility, split(m, row(m)),
@@ -157,6 +158,7 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
 rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
   ## Validation checks
   if (length(items) != length(costs)) stop("Item and cost dimensions do not match")
+  if (length(alpha) != 1) stop("Alpha should be a single numerical expression")
 
   rsa.normVec(mapply(rsa.informativity, items, costs, alpha = alpha))
 }
@@ -179,7 +181,7 @@ rsa.informativity <- function(m_u, alpha = 1, cost = 0) {
   ## Validation checks
   ## -----------------
   if (m_u < 0 | m_u > 1) stop("Invalid semantic `m_u` value, must be between [0, 1]")
-  if (alpha < 0) stop("Invalid alpha, must be a positive numerical expression")
+  if (alpha < 1) stop("Invalid alpha, must be a positive, non-zero numerical expression")
 
   ## Watch for m_u == 0 in which case return 0
   ifelse(m_u == 0, 0, exp(-alpha * (-log(m_u) - cost)))
