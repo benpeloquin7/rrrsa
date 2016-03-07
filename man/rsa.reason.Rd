@@ -2,8 +2,7 @@
 % Please edit documentation in R/reasoning.R
 \name{rsa.reason}
 \alias{rsa.reason}
-\title{Run (multiple) iterations RSA \code{rsa.fullRecursion()}
---------------------------------------------------------}
+\title{Run (multiple) iterations RSA}
 \usage{
 rsa.reason(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)),
   depth = 1, alpha = 1)
@@ -20,7 +19,7 @@ rsa.reason(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)),
 \item{alpha, }{decision hyper-parameter}
 }
 \value{
-, return a matrix of posteriors
+return a matrix of posteriors
 }
 \description{
 Return matrix after undergoing number 'depth' recursions

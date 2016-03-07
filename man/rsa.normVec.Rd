@@ -2,8 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{rsa.normVec}
 \alias{rsa.normVec}
-\title{Normalize vectors
------------------}
+\title{Normalize vectors}
 \usage{
 rsa.normVec(v)
 }

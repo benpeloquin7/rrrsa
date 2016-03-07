@@ -2,8 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{rsa.renameCol}
 \alias{rsa.renameCol}
-\title{Rename df columns avoiding NSE problems
----------------------------------------}
+\title{Rename df columns}
 \usage{
 rsa.renameCol(df, currNames, replacements)
 }

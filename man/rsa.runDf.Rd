@@ -2,11 +2,10 @@
 % Please edit documentation in R/utils.R
 \name{rsa.runDf}
 \alias{rsa.runDf}
-\title{Run RSA on a tidied data frame (assumes one group)
---------------------------------------------------}
+\title{Run RSA on a tidied data frame (assumes one group)}
 \usage{
 rsa.runDf(data, quantityVarName, semanticsVarName, itemVarName,
-  costsVarName = NA, priorsVarName = NA)
+  costsVarName = NA, priorsVarName = NA, depth = 1, alpha = 1)
 }
 \arguments{
 \item{data, }{tidied data}

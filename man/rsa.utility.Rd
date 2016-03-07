@@ -2,8 +2,7 @@
 % Please edit documentation in R/reasoning.R
 \name{rsa.utility}
 \alias{rsa.utility}
-\title{RSA utility
------------}
+\title{RSA utility}
 \usage{
 rsa.utility(items, costs = rep(0, length(items)), alpha = 1)
 }
@@ -16,7 +15,7 @@ or <m1_u, m2_u,...>}
 \item{cost, }{cost vector <u1, u2, ...>}
 }
 \value{
-, return a vector of utilities
+return a vector of utilities
 }
 \description{
 Return normalized utility for a vector

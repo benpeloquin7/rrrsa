@@ -2,8 +2,7 @@
 % Please edit documentation in R/reasoning.R
 \name{rsa.informativity}
 \alias{rsa.informativity}
-\title{RSA Informativity
------------------}
+\title{RSA informativity}
 \usage{
 rsa.informativity(m_u, alpha = 1, cost = 0)
 }

@@ -2,8 +2,7 @@
 % Please edit documentation in R/reasoning.R
 \name{rsa.fullRecursion}
 \alias{rsa.fullRecursion}
-\title{Run one full recursion between listener -> speaker -> listener
---------------------------------------------------------------}
+\title{Run one full recursion between listener -> speaker -> listener}
 \usage{
 rsa.fullRecursion(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)),
   alpha = 1)
@@ -18,11 +17,10 @@ rsa.fullRecursion(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)),
 \item{alpha, }{decision hyper-param}
 }
 \value{
-, fill this out
+fill this out
 }
 \description{
 Run one full recursion between listener -> speaker -> listener
---------------------------------------------------------------
 }
 \examples{
 m <- matrix(data = c(0, 0.2, 0.25, 0.25, 0.3, 0, 0, 0, 0.3, 0.7), nrow = 5)
