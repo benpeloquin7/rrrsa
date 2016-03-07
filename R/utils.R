@@ -1,5 +1,4 @@
 #' Run RSA on a tidied data frame (assumes one group)
-#' --------------------------------------------------
 #'
 #' Expects tidied data with three required and two optional fields
 #' 1) quanityVarName         :: entity name we're quantifying over
@@ -108,8 +107,7 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
   mergedData
 }
 
-#' Rename df columns avoiding NSE problems
-#' ---------------------------------------
+#' Rename df columns
 #'
 #' return a data frame with columns renamed
 #' (if they exist in the df passed in)
@@ -128,7 +126,6 @@ rsa.renameCol <- function(df, currNames, replacements) {
 }
 
 #' Normalize vectors
-#' -----------------
 #'
 #' Return a normalized vector
 #' @param v, vector to be normalized

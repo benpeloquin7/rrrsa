@@ -133,7 +133,7 @@ rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
   rsa.normVec(mapply(rsa.informativity, items, costs, alpha = alpha))
 }
 
-#' RSA Informativity
+#' RSA informativity
 #'
 #' e^(-alpha * (-log(p(m|u)) - cost))
 #' @param m_u, literal semantics of meaning given utterance
