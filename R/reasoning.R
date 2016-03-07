@@ -1,24 +1,52 @@
-
-#' Tune depth and alpha
+#' Tune depth and alpha hyperparamters
 #'
+#' Return a list with number of alpha \times depths elements
+#' each element includes a tuple of (correlation, alpha, depth)
+#' @param data, tidied data
+#' @param quanityVarName, entity name we're quantifying over
+#' @param semanticsVarName, semantic values for inference computation
+#' @param itemVarName, unique items were comparing, probaby words
+#' @param groupName, grouping variable if we have one
+#' @param compareDataName, pragmatic judgments we're comparing to
+#' @param costsVarName, costs variable name
+#' @param priorsVarName, priors variable name
+#' @param depths, vector of depths (in integers) for tuning
+#' @param alphas, vector of alphas for tuning
+#' @param compareItems, specific items (in itemVarName col) for data subsetting
+#' @return, return a list of \# alphas \times \# depths tuples with (r, depth, alpha)
+#' @keywords data tuning
+#' @importFrom magrittr "%>%"
+#' @return return a matrix of posteriors
+#' @keywords recursion
+#' @export
+#' @examples
+#' print("need to do examples and validation checks")
 rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarName, groupName = NA, compareDataName,
-                               costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1,
-                               verbose = FALSE) {
+                               costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareItems = NA) {
 
+  counter <- 1
   cors <- list()
   ## running multiple groups
   if (!is.na(groupName)) {
     for (a in alphas) {
       for (d in depths) {
-        currRun <- plyr::ddply(data, .fun = rsa.runDf, .variables = c(groupName),
-                               quantityVarName = quantityVarName,
-                               semanticsVarName = semanticsVarName,
-                               itemVarName = itemVarName,
-                               costsVarName = costsVarName,
-                               priorsVarName = priorsVarName,
-                               depth = d, alpha = a)
-        cors <- list(cors, c(cor = cor(currRun[, compareDataName],
-                                       currRun[, "preds"]), depth = d, alpha = a))
+          currRun <- plyr::ddply(data, .fun = rsa.runDf, .variables = c(groupName),
+                                 quantityVarName = quantityVarName,
+                                 semanticsVarName = semanticsVarName,
+                                 itemVarName = itemVarName,
+                                 costsVarName = costsVarName,
+                                 priorsVarName = priorsVarName,
+                                 depth = d, alpha = a)
+          if (is.na(compareItems)) {
+            cors[[counter]] <- c(cor = cor(currRun[, compareDataName],
+                                           currRun[, "preds"]), depth = d, alpha = a)
+          } else {
+            compareRows <- sapply(data[, itemVarName], function(i) i %in% compareItems)
+            cors[[counter]] <- c(cor = cor(currRun[compareRows, compareDataName],
+                                           currRun[compareRows, "preds"]), depth = d, alpha = a)
+          }
+
+        counter <- counter + 1
       }
     }
   }
