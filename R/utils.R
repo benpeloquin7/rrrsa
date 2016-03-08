@@ -21,7 +21,21 @@
 #'
 rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
                       costsVarName = NA, priorsVarName = NA, depth = 1, alpha = 1) {
-  #! validation checks here
+
+  ## `Not in` helper
+  `%!in%` <- function(check, src) {
+    !(check %in% src)
+  }
+
+  ## validation checks
+  ## -----------------
+  ## basic check for three neccessary specifications
+  if (any(c(quantityVarName, semanticsVarName, itemVarName) %!in% names(data))) {
+    stop("Cannot find column specification for quantity OR semantics OR items")
+  }
+  if (!is.numeric(unlist(dplyr::select_(data, semanticsVarName)))) stop("runDf expects semantics to be a numeric quantity")
+  if (!is.na(costsVarName) & costsVarName %!in% names(data)) stop("Cannot find costs column")
+  if (!is.na(priorsVarName) & priorsVarName %!in% names(data)) stop("Cannot find priors column")
 
   ## initial data processing
   ## -----------------------
@@ -103,7 +117,7 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
 
 
   ## join with original data set
-  mergedData <- left_join(originalData, renamedDf)
+  mergedData <- dplyr::left_join(originalData, renamedDf)
   mergedData
 }
 
@@ -120,8 +134,13 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
 #' NA
 #'
 rsa.renameCol <- function(df, currNames, replacements) {
-  indices <- which(names(df) %in% currNames)
-  names(df)[indices] <- replacements[indices]
+  if (!any(names(df) %in% currNames)) warning("Please review colnames passsed, no matches found.")
+  indices <- which(names(df) %in% currNames) #! get df indices for cols
+  names(currNames) <- replacements           #! store 'replacements' in attr
+  for (i in indices) {
+    names(df)[i] <-  #! for each name to replace, get name attr
+      names(currNames[which(currNames == names(df)[i])])
+  }
   df
 }
 
@@ -138,6 +157,7 @@ rsa.renameCol <- function(df, currNames, replacements) {
 #' normVec(vec2)
 #'
 rsa.normVec <- function(v) {
+  if (!is.numeric(v) | any(sapply(v, function(i) i < 0))) stop("rsa.normVec expects positive numerical vector")
   normalizer = sum(v)
   if (normalizer == 0) rep(0, length(v))
   else (v / normalizer)
@@ -151,8 +171,8 @@ rsa.normVec <- function(v) {
 #'
 rsa.convertVecType<- function(vec1, vec2) {
   if (typeof(vec1) == typeof(vec2)) vec2
-  else if (is.numeric(vec1)) as.numeric(vec2)
   else if (is.factor(vec1)) as.factor(vec2)
   else if (is.character(vec1)) as.character(vec2)
+  ## do not try to convert numerics (this will lead to NA coercion)
   else vec2
 }
