@@ -1,6 +1,6 @@
 #' Tune depth and alpha hyperparamters
 #'
-#' Return a list with number of alpha \times depths elements
+#' Return a list with number of alpha * depths elements
 #' each element includes a tuple of (correlation, alpha, depth)
 #' @param data, tidied data
 #' @param quanityVarName, entity name we're quantifying over
@@ -13,7 +13,7 @@
 #' @param depths, vector of depths (in integers) for tuning
 #' @param alphas, vector of alphas for tuning
 #' @param compareItems, specific items (in itemVarName col) for data subsetting
-#' @return, return a list of \# alphas \times \# depths tuples with (r, depth, alpha)
+#' @return, return a list of \# alphas * \# depths tuples with (r, depth, alpha)
 #' @keywords data tuning
 #' @importFrom magrittr "%>%"
 #' @return return a matrix of posteriors
@@ -27,7 +27,7 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
   counter <- 1
   cors <- list()
   ## running multiple groups
-  if (!is.na(groupName)) {
+  if (!any(is.na(groupName))) {
     for (a in alphas) {
       for (d in depths) {
           currRun <- plyr::ddply(data, .fun = rsa.runDf, .variables = c(groupName),

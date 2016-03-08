@@ -32,12 +32,12 @@ rsa.tuneDepthAlpha(data, quantityVarName, semanticsVarName, itemVarName,
 \item{quanityVarName, }{entity name we're quantifying over}
 }
 \value{
-, return a list of \# alphas \times \# depths tuples with (r, depth, alpha)
+, return a list of \# alphas * \# depths tuples with (r, depth, alpha)
 
 return a matrix of posteriors
 }
 \description{
-Return a list with number of alpha \times depths elements
+Return a list with number of alpha * depths elements
 each element includes a tuple of (correlation, alpha, depth)
 }
 \examples{
