@@ -1,15 +1,15 @@
 Package: rrrsa
 Maintainer: Ben peloquin <bpeloqui@stanford.edu>
-Title: Run rational speeach act (rrrsa) models of pragmatic inference
+Title: Run Rational Speech Act Models of Pragmatic Inference
 Version: 0.0.0.9000
-Authors@R: person("Ben", "Peloquin", email = "bpeloqui@stanford.edu", role = c("aut", "cre"))
+Authors@R: person("Ben", "Peloquin", , "bpeloqui@stanford.edu", c("aut", "cre"))
 Description: Functions to run rational speech act (RSA) models with individual
-    level model computations and data processing.
+    level model computations and data processing functionality.
 Depends:
     R (>= 3.2.3)
 Imports: plyr, dplyr, tidyr, magrittr
 LazyData: true
-License: GPL-2
+License: GPL (>= 2)
 RoxygenNote: 5.0.1
 Suggests: testthat,
     knitr,
