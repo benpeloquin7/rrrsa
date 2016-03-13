@@ -1,13 +1,37 @@
 ---
-title: "Vignette Title"
-author: "Vignette Author"
+title: "rrrsa"
+author: "Ben Peloquin"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{rrrsa}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+
+
+# Run the rational speech act model (RSA) of pragmatic inference on data
+
+`rrrsa` is an R package for running RSA, a Bayesian model of pragmatic inference. Below is a concise tour of some of the things rrrsa can do for you. 
+
+rrrsa was created by Ben Peloquin.
+
+## What is RSA?
+
+Rational speech act models formalize language understanding as a special case of social cognition in which `speakers` and `listeners` reason about one another recursively (Frank \& Goodman 2012; Goodman \& Stuhmuller, 2014). That is a `listener` 
+
+$$P_{L_n}(m|u) \propto P_{S_n}(u|m)P(m)$$
+where
+$$P_{S_n} \propto e^U(m;u)$$
+and
+$$U(m;u) = -\alpha(\log(P_{L_{n-1}(m|u) - C(u)))$$
+
+
+
+
+Everything below this is the template vignette code
+
 
 Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
 
