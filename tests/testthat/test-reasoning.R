@@ -17,8 +17,6 @@ test_that("rsa.informativity passed valid values", {
   expect_error(rsa.informativity(m_u = 0.5, alpha = -1),
                "Invalid alpha, must be a positive, non-zero numerical expression")  #! alpha values must be (0, +inf)
 })
-# debug(rsa.informativity)
-# undebug(rsa.informativity)
 
 ## rsa.utility()
 ## -------------
@@ -39,8 +37,6 @@ test_that("rsa.utility passed valid values", {
   expect_error(rsa.utility(items = items1, costs = costs2, alpha = costs1), #! alpha should be length 1
                "Invalid alpha amount, must be numerical expression strictly greather than 0")
 })
-# debug(rsa.utility)
-# undebug(rsa.utility)
 
 ## rsa.fullRecursion()
 ## -------------------
@@ -70,8 +66,6 @@ test_that("rsa.fullRecursion passed valid values", {
   expect_error(rsa.fullRecursion(m, alpha = c(1, 2)), "Invalid alpha amount, must be numerical expression strictly greather than 0")
   expect_error(rsa.fullRecursion(m, alpha = "apple"), "Invalid alpha amount, must be numerical expression strictly greather than 0")
 })
-# undebug(rsa.fullRecursion)
-# debug(rsa.fullRecursion)
 
 ## rsa.reason()
 ## ------------
@@ -107,5 +101,3 @@ test_that("rsa.reason passed valid values", {
   expect_error(rsa.reason(m, alpha = c(1, 2)), "Invalid alpha amount, must be numerical expression strictly greather than 0")
   expect_error(rsa.reason(m, alpha = "apple"), "Invalid alpha amount, must be numerical expression strictly greather than 0")
 })
-# undebug(rsa.reason)
-# debug(rsa.reason)
