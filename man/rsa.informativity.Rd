@@ -15,14 +15,15 @@ from optimal action selection)}
 \item{cost, }{cost of utterance u}
 }
 \value{
-, fill this out
+, inormativity of utterance u given meaning m and cost
 }
 \description{
-e^(-alpha * (-log(p(m|u)) - cost))
+Calculate: e^(-alpha * (-log(p(m|u)) - cost))
 }
 \examples{
-rsa.informativity(0.5, 1, 0) == 0.5
-rsa.informatitivy(0, 0, 0) == 0.0
+rsa.informativity(m_u = 0.5, alpha = 1, cost = 0) == 0.5
+rsa.informatitivy(m_u = 0, alpha = 1, cost = 0) == 0.0
+rsa.informatitivy(m_u = 0.5, alpha = 1, cost = 2)
 
 }
 \keyword{surprisal}

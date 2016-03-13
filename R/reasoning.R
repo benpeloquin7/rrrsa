@@ -1,7 +1,8 @@
 #' Tune depth and alpha hyperparamters
 #'
 #' Return a list with number of alpha * depths elements
-#' each element includes a tuple of (correlation, alpha, depth)
+#' each element includes a tuple of (correlation, alpha, depth).
+#' Same basic call functionality as \code{runDf()}
 #' @param data, tidied data
 #' @param quanityVarName, entity name we're quantifying over
 #' @param semanticsVarName, semantic values for inference computation
@@ -13,14 +14,23 @@
 #' @param depths, vector of depths (in integers) for tuning
 #' @param alphas, vector of alphas for tuning
 #' @param compareItems, specific items (in itemVarName col) for data subsetting
-#' @return, return a list of \# alphas * \# depths tuples with (r, depth, alpha)
+#' @return list of length(alphas) * length(depths) tuples with (correlation, depth, alpha)
 #' @keywords data tuning
-#' @importFrom magrittr "%>%"
-#' @return return a matrix of posteriors
-#' @keywords recursion
 #' @export
 #' @examples
-#' print("need to do examples and validation checks")
+#' d <- peloquinFrank_5Alts
+#' alphas <- seq(1, 3, by = 0.1)
+#' depths <- 1:3
+#' checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
+#' "palatable", "delicious")
+#' results <- rsa.tuneDepthAlpha(data = d, groupName = "scale",
+#' quantityVarName = "stars", itemVarName = "words",
+#' semanticsVarName = "speaker.p", compareDataName = "e11",
+#' compareItems = checkWords, alphas = alphas, depths = depths)
+#' head(results)
+#' best <- which.max(unlist(lapply(results, function(i) i[[1]][1])))
+#' results[[best]]
+#'
 rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarName, groupName = NA, compareDataName,
                                costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareItems = NA) {
 
@@ -53,8 +63,6 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
   cors
 }
 
-
-
 #' Run (multiple) iterations RSA
 #'
 #' Return matrix after undergoing number 'depth' recursions
@@ -72,7 +80,6 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
 #' colnames(m) <- c("item1", "item2")
 #' rsa.reason(m, 0)
 #' rsa.reason(m, 2)
-#' priors <- c(0.1, 0.1, 0.1, 0.1, 0.6)
 #'
 rsa.reason <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), depth = 1, alpha = 1) {
   ## Validation checks
@@ -103,7 +110,7 @@ rsa.reason <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), dep
 #' @param costs, length m vector of costs (default is 0 valued vector)
 #' @param priors, default uniform, vector of length nrow() [semantic quantity]
 #' @param alpha, decision hyper-param
-#' @return fill this out
+#' @return matrix of posterior values
 #' @keywords recursion
 #' @export
 #' @examples
@@ -164,12 +171,16 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
 #' RSA utility
 #'
 #' Return normalized utility for a vector
-#' @param items, literal semantic input vector <m_u1, m_u2, ...>
-#' or <m1_u, m2_u,...>
+#' @param items, literal semantic input vector <m_u1, m_u2,..., m_uN>
 #' @param alpha, decision noise parameter (see 'informativity()')
-#' @param cost, cost vector <u1, u2, ...>
+#' @param cost, cost vector <u1, u2,..., uN>
 #' @return return a vector of utilities
 #' @export
+#' @examples
+#' literalSemantics <- c(0.0, 0.0, 0.3, 0.3, 0.4)
+#' rsa.utility(items = literalSemantics)
+#' costs <- c(0.0, 0.0, 0.2, 0.3, 0.4)
+#' rsa.utility(items = literalSemantics, costs = costs)
 #'
 rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
   ## Validation checks
@@ -182,17 +193,18 @@ rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
 
 #' RSA informativity
 #'
-#' e^(-alpha * (-log(p(m|u)) - cost))
+#' Calculate: e^(-alpha * (-log(p(m|u)) - cost))
 #' @param m_u, literal semantics of meaning given utterance
 #' @param alpha, decision noise parameter (speaker's deviation
 #' from optimal action selection)
 #' @param cost, cost of utterance u
-#' @return, fill this out
+#' @return, inormativity of utterance u given meaning m and cost
 #' @keywords surprisal
 #' @export
 #' @examples
-#' rsa.informativity(0.5, 1, 0) == 0.5
-#' rsa.informatitivy(0, 0, 0) == 0.0
+#' rsa.informativity(m_u = 0.5, alpha = 1, cost = 0) == 0.5
+#' rsa.informativity(m_u = 0, alpha = 1, cost = 0) == 0.0
+#' rsa.informativity(m_u = 0.5, alpha = 1, cost = 2)
 #'
 rsa.informativity <- function(m_u, alpha = 1, cost = 0) {
   ## Validation checks

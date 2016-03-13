@@ -17,7 +17,7 @@ rsa.fullRecursion(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)),
 \item{alpha, }{decision hyper-param}
 }
 \value{
-fill this out
+matrix of posterior values
 }
 \description{
 Run one full recursion between listener -> speaker -> listener

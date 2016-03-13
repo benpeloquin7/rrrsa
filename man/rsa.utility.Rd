@@ -7,17 +7,23 @@
 rsa.utility(items, costs = rep(0, length(items)), alpha = 1)
 }
 \arguments{
-\item{items, }{literal semantic input vector <m_u1, m_u2, ...>
-or <m1_u, m2_u,...>}
+\item{items, }{literal semantic input vector <m_u1, m_u2,..., m_uN>}
 
 \item{alpha, }{decision noise parameter (see 'informativity()')}
 
-\item{cost, }{cost vector <u1, u2, ...>}
+\item{cost, }{cost vector <u1, u2,..., uN>}
 }
 \value{
 return a vector of utilities
 }
 \description{
 Return normalized utility for a vector
+}
+\examples{
+literalSemantics <- c(0.0, 0.0, 0.3, 0.3, 0.4)
+rsa.utility(items = literalSemantics)
+costs <- c(0.0, 0.0, 0.2, 0.3, 0.4)
+rsa.utility(items = literalSemantics, costs = costs)
+
 }
 

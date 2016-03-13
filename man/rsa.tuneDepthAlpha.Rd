@@ -32,18 +32,28 @@ rsa.tuneDepthAlpha(data, quantityVarName, semanticsVarName, itemVarName,
 \item{quanityVarName, }{entity name we're quantifying over}
 }
 \value{
-, return a list of \# alphas * \# depths tuples with (r, depth, alpha)
-
-return a matrix of posteriors
+list of length(alphas) * length(depths) tuples with (correlation, depth, alpha)
 }
 \description{
 Return a list with number of alpha * depths elements
-each element includes a tuple of (correlation, alpha, depth)
+each element includes a tuple of (correlation, alpha, depth).
+Same basic call functionality as \code{runDf()}
 }
 \examples{
-print("need to do examples and validation checks")
+d <- peloquinFrank_5Alts
+alphas <- seq(1, 3, by = 0.1)
+depths <- 1:3
+checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
+"palatable", "delicious")
+results <- rsa.tuneDepthAlpha(data = d, groupName = "scale",
+quantityVarName = "stars", itemVarName = "words",
+semanticsVarName = "speaker.p", compareDataName = "e11",
+compareItems = checkWords, alphas = alphas, depths = depths)
+head(results)
+best <- which.max(unlist(lapply(results, function(i) i[[1]][1])))
+results[[best]]
+
 }
 \keyword{data}
-\keyword{recursion}
 \keyword{tuning}
 

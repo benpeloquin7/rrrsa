@@ -30,7 +30,6 @@ rownames(m) <- 1:5
 colnames(m) <- c("item1", "item2")
 rsa.reason(m, 0)
 rsa.reason(m, 2)
-priors <- c(0.1, 0.1, 0.1, 0.1, 0.6)
 
 }
 \keyword{recursion}

@@ -20,6 +20,18 @@ data frame with changed col names
 return a data frame with columns renamed
 (if they exist in the df passed in)
 }
+\keyword{"UPPER_CASE"))}
+\keyword{"upper_case"),}
+\keyword{<-}
+\keyword{=}
+\keyword{LETTERS[1:3])}
+\keyword{c("LOWER_CASE",}
+\keyword{c("lower_case",}
 \keyword{data}
+\keyword{data.frame(LOWER_CASE}
+\keyword{df}
+\keyword{letters[1:3],}
 \keyword{processing}
+\keyword{rsa.renameCol(df,}
+\keyword{upper_case}
 

@@ -34,6 +34,7 @@ Expects tidied data with three required and two optional fields
 5) optional priorsVarName :: priors
 }
 \examples{
+rsa.runDf(peloquinFrank_2Alts, "stars", "speaker.p", "words")
 
 }
 \keyword{functionality}

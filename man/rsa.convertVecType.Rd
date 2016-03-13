@@ -17,4 +17,10 @@ vec2 with type matched to vec1
 \description{
 Convert vector data type
 }
+\examples{
+v1 <- as.factor(c("one", "two", "three"))
+v2 <- c("one", "two", "three")
+rsa.convertVecType(v1, v2)
+
+}
 

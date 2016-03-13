@@ -15,6 +15,11 @@ rsa.normVec(v)
 \description{
 Return a normalized vector
 }
+\examples{
+v <- rep(0.8, 5)
+rsa.normVec(v)
+
+}
 \keyword{data}
 \keyword{processing}
 
