@@ -27,7 +27,7 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
   counter <- 1
   cors <- list()
   ## running multiple groups
-  if (!any(is.na(groupName))) {
+  if (!is.na(groupName)) {
     for (a in alphas) {
       for (d in depths) {
           currRun <- plyr::ddply(data, .fun = rsa.runDf, .variables = c(groupName),
@@ -37,7 +37,7 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
                                  costsVarName = costsVarName,
                                  priorsVarName = priorsVarName,
                                  depth = d, alpha = a)
-          if (is.na(compareItems)) {
+          if (length(compareItems) == 1 & is.na(compareItems[1])) {
             cors[[counter]] <- c(cor = cor(currRun[, compareDataName],
                                            currRun[, "preds"]), depth = d, alpha = a)
           } else {
