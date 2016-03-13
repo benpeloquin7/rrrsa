@@ -1,12 +1,17 @@
 Package: rrrsa
-Title: Really recursive rational speeach act (rrrsa) models of pragmatic inference (Frank \& Goodman 2012).
+Title: Run rational speeach act (rrrsa) models of pragmatic inference.
 Version: 0.0.0.9000
 Authors@R: person("Ben", "Peloquin", email = "bpeloqui@stanford.edu", role = c("aut", "cre"))
-Description: Model pragmatic inference (e.g. scalar implicature)
+Description: Functions to run rational speech act (RSA) model with individual
+    level model computations and data frame processing.
 Depends:
     R (>= 3.2.3)
-Imports: dplyr, tidyr, ggplot2, magrittr
+Imports: pryr, dplyr, tidyr, magrittr
+Suggests: pryr
 License: What license is it under?
 LazyData: true
 RoxygenNote: 5.0.1
-Suggests: testthat
+Suggests: testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
