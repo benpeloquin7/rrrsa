@@ -165,8 +165,8 @@ rsa.normVec <- function(v) {
 #'
 rsa.convertVecType<- function(vec1, vec2) {
   if (typeof(vec1) == typeof(vec2)) vec2
-  else if (is.integer(vec1)) as.integer(vec2)
   else if (is.factor(vec1)) as.factor(vec2)
+  else if (is.integer(vec1)) as.integer(vec2)
   else if (is.character(vec1)) as.character(vec2)
   else vec2
 }
