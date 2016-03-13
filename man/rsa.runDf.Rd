@@ -10,6 +10,8 @@ rsa.runDf(data, quantityVarName, semanticsVarName, itemVarName,
 \arguments{
 \item{data, }{tidied data}
 
+\item{semanticsVarName, }{literal listener semantics for RSA computations}
+
 \item{itemVarName, }{unique items were compring, probaby words
 (i.e. "degrees" in Peloquin & Frank (2016))}
 

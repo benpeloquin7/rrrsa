@@ -15,13 +15,6 @@ rsa.normVec(v)
 \description{
 Return a normalized vector
 }
-\examples{
-vec1 <- c(1, 1, 1)
-normVec(vec1)
-vec2 <- c(0, 0, 0, 0)
-normVec(vec2)
-
-}
 \keyword{data}
 \keyword{processing}
 

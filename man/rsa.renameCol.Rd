@@ -20,10 +20,6 @@ data frame with changed col names
 return a data frame with columns renamed
 (if they exist in the df passed in)
 }
-\examples{
-NA
-
-}
 \keyword{data}
 \keyword{processing}
 
