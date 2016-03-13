@@ -105,7 +105,7 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
 
   ## tidy data
   tidyPosterior<- data.frame(posteriors) %>%
-    dplyr::mutate(quantityVarName = rownames(.)) %>% #! add back quantity (stored in rownames)
+    dplyr::mutate(quantityVarName = rownames(posteriors)) %>% #! add back quantity (stored in rownames)
     tidyr::gather(itemVarName, "preds", -quantityVarName)
 
 
