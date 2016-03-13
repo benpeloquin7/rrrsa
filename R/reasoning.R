@@ -173,7 +173,7 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
 #' Return normalized utility for a vector
 #' @param items, literal semantic input vector <m_u1, m_u2,..., m_uN>
 #' @param alpha, decision noise parameter (see 'informativity()')
-#' @param cost, cost vector <u1, u2,..., uN>
+#' @param costs, cost vector <u1, u2,..., uN>
 #' @return return a vector of utilities
 #' @export
 #' @examples

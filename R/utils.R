@@ -6,19 +6,24 @@
 #' 3) semanticsVarName       :: literal listener semantics
 #' 4) optional costsVarName  :: costs
 #' 5) optional priorsVarName :: priors
+#' rsa-ready, tidied data should have a unique semantic value for each quantity * item combination.
+#' (see formatting of peloquinFrank_2Alts data).
 #' @param data, tidied data
-#' @param quanityVarName, entity name we're quantifying over
+#' @param quantityVarName, entity name we're quantifying over
 #' (i.e. "stars" in Peloquin & Frank (2016))
 #' @param semanticsVarName, literal listener semantics for RSA computations
-#' @param itemVarName, unique items were compring, probaby words
+#' @param itemVarName, unique items were comparing, probaby words
 #' (i.e. "degrees" in Peloquin & Frank (2016))
 #' @param costsVarName, costs variable name
 #' @param priorsVarName, priors variable name
-#' @return, return data frame with 'pred' col appended
+#' @param alpha, decision noise parameter level
+#' @param depth, recursive depth parameter
+#' @return data frame with posterior predictions 'preds' column appended
 #' @keywords primary run functionality
 #' @importFrom magrittr "%>%"
 #' @export
 #' @examples
+#' rsa.runDf(peloquinFrank_2Alts, "stars", "speaker.p", "words")
 #'
 rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
                       costsVarName = NA, priorsVarName = NA, depth = 1, alpha = 1) {
@@ -130,7 +135,11 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
 #' @param currNames, names we want to replace (passed as characters)
 #' @param replacements, values used as replacements
 #' @return data frame with changed col names
+#' @export
 #' @keywords data processing
+#' @examples
+#' df <- data.frame(LOWER_CASE = letters[1:3], upper_case = LETTERS[1:3])
+#' rsa.renameCol(df, c("LOWER_CASE", "upper_case"), c("lower_case", "UPPER_CASE"))
 #'
 rsa.renameCol <- function(df, currNames, replacements) {
   if (!any(names(df) %in% currNames)) warning("Please review colnames passsed, no matches found.")
@@ -147,8 +156,12 @@ rsa.renameCol <- function(df, currNames, replacements) {
 #'
 #' Return a normalized vector
 #' @param v, vector to be normalized
-#' @return, normalized vector
+#' @return a normalized vector
 #' @keywords data processing
+#' @export
+#' @examples
+#' v <- rep(0.8, 5)
+#' rsa.normVec(v)
 #'
 rsa.normVec <- function(v) {
   if (!is.numeric(v) | any(sapply(v, function(i) i < 0))) stop("rsa.normVec expects positive numerical vector")
@@ -161,9 +174,16 @@ rsa.normVec <- function(v) {
 #'
 #' @param vec1, first vector with type we want to match
 #' @param vec2, second vector with type we'd like to transform
+#' @export
 #' @return vec2 with type matched to vec1
+#' @examples
+#' v1 <- as.factor(c("one", "two", "three"))
+#' v2 <- c("one", "two", "three")
+#' v3 <- c("1", "2", "3")
+#' rsa.convertVecType(v1, v2)
+#' rsa.convertVecType(v1, v3)
 #'
-rsa.convertVecType<- function(vec1, vec2) {
+rsa.convertVecType <- function(vec1, vec2) {
   if (typeof(vec1) == typeof(vec2)) vec2
   else if (is.factor(vec1)) as.factor(vec2)
   else if (is.integer(vec1)) as.integer(vec2)
