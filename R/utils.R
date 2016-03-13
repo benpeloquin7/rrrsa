@@ -9,6 +9,7 @@
 #' @param data, tidied data
 #' @param quanityVarName, entity name we're quantifying over
 #' (i.e. "stars" in Peloquin & Frank (2016))
+#' @param semanticsVarName, literal listener semantics for RSA computations
 #' @param itemVarName, unique items were compring, probaby words
 #' (i.e. "degrees" in Peloquin & Frank (2016))
 #' @param costsVarName, costs variable name
@@ -130,8 +131,6 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
 #' @param replacements, values used as replacements
 #' @return data frame with changed col names
 #' @keywords data processing
-#' @examples
-#' NA
 #'
 rsa.renameCol <- function(df, currNames, replacements) {
   if (!any(names(df) %in% currNames)) warning("Please review colnames passsed, no matches found.")
@@ -150,11 +149,6 @@ rsa.renameCol <- function(df, currNames, replacements) {
 #' @param v, vector to be normalized
 #' @return, normalized vector
 #' @keywords data processing
-#' @examples
-#' vec1 <- c(1, 1, 1)
-#' normVec(vec1)
-#' vec2 <- c(0, 0, 0, 0)
-#' normVec(vec2)
 #'
 rsa.normVec <- function(v) {
   if (!is.numeric(v) | any(sapply(v, function(i) i < 0))) stop("rsa.normVec expects positive numerical vector")
@@ -171,8 +165,8 @@ rsa.normVec <- function(v) {
 #'
 rsa.convertVecType<- function(vec1, vec2) {
   if (typeof(vec1) == typeof(vec2)) vec2
+  else if (is.integer(vec1)) as.integer(vec2)
   else if (is.factor(vec1)) as.factor(vec2)
   else if (is.character(vec1)) as.character(vec2)
-  ## do not try to convert numerics (this will lead to NA coercion)
   else vec2
 }
