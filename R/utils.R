@@ -118,7 +118,7 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
 
 
   ## join with original data set
-  mergedData <- dplyr::left_join(originalData, renamedDf)
+  mergedData <- suppressMessages(suppressWarnings(dplyr::left_join(originalData, renamedDf)))
   mergedData
 }
 
