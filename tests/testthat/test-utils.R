@@ -6,8 +6,6 @@ test_that("rsa.convertVecType returns valid values", {
   v1 <- seq(1, 5)
   v2 <- LETTERS[v1]
   v3 <- as.factor(v2)
-
-  expect_equal(length(v1), length(rsa.convertVecType(v1, v2))) #! maintian length
   expect_equal(typeof(v2), typeof(rsa.convertVecType(v2, v1))) #! numeric to character
   expect_equal(typeof(v3), typeof(rsa.convertVecType(v3, v1))) #! numeric to factor
   expect_equal(typeof(v2), typeof(rsa.convertVecType(v2, v3))) #! factor to character
@@ -19,7 +17,7 @@ test_that("rsa.convertVecType returns valid values", {
 test_that("rsa.normVec returns valid values", {
   vec1 <- seq(1, 5)
   answer_vec1 <- seq(1, 5) / sum(seq(1, 5))
-  bad_vec <- letters[v1]
+  bad_vec <- letters[vec1]
   zero_vec <- rep(0, 100)
   neg_vec <- zero_vec; neg_vec[100] <- -100
 
@@ -38,15 +36,9 @@ test_that("rsa.renameCol correctly renames cols", {
   expect_equal(c("lowerCase", "UpperCase", "numbers"), names(rsa.renameCol(df, c("letters", "LETTERS"), c("lowerCase", "UpperCase"))))
   expect_warning(rsa.renameCol(df, c("ben", "peloquin"), c("lowerCase", "UpperCase")), "Please review colnames passsed, no matches found.")
 })
-# undebug(rsa.renameCol)
-# debug(rsa.renameCol)
 
 ## rsa.runDf
 ## ---------
-test-that("rsa.runDf passed correct data", {
-
-})
-
 test_that("rsa.runDf returns correct values", {
   df <- data.frame(scales = c(rep("some_all", 10), rep("good_excellent", 10)),
                     stars = as.factor(rep(1:5, 4)),
@@ -78,5 +70,3 @@ test_that("rsa.runDf returns correct values", {
   expect_error(rsa.runDf(badSemantics, quantityVarName = "stars", semanticsVarName = "speaker.p", itemVarName = "words",
                          costsVarName = "costs"), "runDf expects semantics to be a numeric quantity")
 })
-debug(rsa.runDf)
-undebug(rsa.runDF)
