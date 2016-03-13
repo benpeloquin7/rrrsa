@@ -78,6 +78,7 @@ rsa.fullRecursion(m = m, costs = costs, priors = priors) ## literal semantics, c
 `rsa.reason` is really a wrapper function for `rsa.fullRecursion` which provides an additional `depth` parameter which specifies the recursive depth during reasoning. If depth is not provided, default value is $1$.
 ```{r}
 all(rsa.reason(m = m) == rsa.fullRecursion(m = m))
+all(rsa.reason(m = m, depth = 2) == rsa.fullRecursion(rsa.fullRecursion(m = m)))
 rsa.reason(m = m, depth = 2)
 rsa.reason(m = m, depth = 10)
 rsa.reason(m = m, costs = costs, priors = priors, depth = 2)
@@ -145,62 +146,29 @@ tail(
 )
 ```
 
-
 ### Tuning hyperparamaters
-Continue work here
-
-
-Given the functionality for running data frames (and with multiple groups showcased above), we provide functionality for tuning `alpha` and `depth` hyperparameters. `rsa.tuneDepthAlpha` takes the same arguments one would specify for `runDf`. However the `alpha` and `depth` arguments should now be vectors of user supplied values. User should also specifiy a grouping variable if the data contains multiple sub-groups to run (such as `scales` in Peloquin & Frank, 2016).
-
-Everything below this is the template vignette code
-
-
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
-
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
-
-
-
-## Vignette Info
-
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+If a user has `pragmatic judgment` data we can use the `tuneDepthAlpha` function to tune hypeparameters. Calling this function requires the same argument list as a simple `runDf` with the addition of `alphas` and `depths` vectors to iterate over as well as the column of `pragmatic judgments` specified through the `compareDataVarName` argument, which we'll be using as the basis of comparison.
+```{r}
+d <- peloquinFrank_5Alts
+str(d)
+alphas <- seq(1, 3, by = 0.1)
+depths <- 1:3
+```
+Users may also want to check only a subset of the items in their data frame for tuning. In the case of Peloquin & Frank (2016) we only wanted to tune against `entailment` pairs. The `compareItems` argument allows the user to pass a vector of items check specifically.
+```{r}
+checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
+                "palatable", "delicious")
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+```{r warning=FALSE}
+results <- rsa.tuneDepthAlpha(data = d, groupName = "scale", 
+                     quantityVarName = "stars", itemVarName = "words",
+                     semanticsVarName = "speaker.p", compareDataName = "e11",
+                     compareItems = checkWords, alphas = alphas, depths = depths)
+head(results)
 ```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+`rsa.tuneDepthAlpha` returns a list of (`correlation`, `depth`, `alpha`) tuples which an be used for plotting or users can simply sort to find the hyperparamter combination leading to best model fit.
+```{r}
+best <- which.max(unlist(lapply(results, function(i) i[[1]][1])))
+results[[best]]
+```
