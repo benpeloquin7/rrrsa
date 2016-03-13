@@ -22,8 +22,8 @@ Calculate: e^(-alpha * (-log(p(m|u)) - cost))
 }
 \examples{
 rsa.informativity(m_u = 0.5, alpha = 1, cost = 0) == 0.5
-rsa.informatitivy(m_u = 0, alpha = 1, cost = 0) == 0.0
-rsa.informatitivy(m_u = 0.5, alpha = 1, cost = 2)
+rsa.informativity(m_u = 0, alpha = 1, cost = 0) == 0.0
+rsa.informativity(m_u = 0.5, alpha = 1, cost = 2)
 
 }
 \keyword{surprisal}

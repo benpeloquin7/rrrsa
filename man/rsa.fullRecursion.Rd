@@ -28,9 +28,6 @@ rownames(m) <- 1:5
 colnames(m) <- c("item1", "item2")
 rsa.fullRecursion(m)
 rsa.fullRecursion(rsa.fullRecursion(m))
-costs <- matrix(data = c(rep(-0.2, 5), rep(-0.8, 5)), nrow = 5)
-rsa.fullRecursion(m, costs)
-rsa.fullRecursion(rsa.fullRecursion(m, costs), costs)
 
 }
 \keyword{recursion}

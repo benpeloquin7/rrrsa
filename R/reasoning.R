@@ -4,7 +4,7 @@
 #' each element includes a tuple of (correlation, alpha, depth).
 #' Same basic call functionality as \code{runDf()}
 #' @param data, tidied data
-#' @param quanityVarName, entity name we're quantifying over
+#' @param quantityVarName, entity name we're quantifying over
 #' @param semanticsVarName, semantic values for inference computation
 #' @param itemVarName, unique items were comparing, probaby words
 #' @param groupName, grouping variable if we have one
@@ -78,8 +78,8 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
 #' m <- matrix(data = c(0, 0.2, 0.25, 0.25, 0.3, 0, 0, 0, 0.3, 0.7), nrow = 5)
 #' rownames(m) <- 1:5
 #' colnames(m) <- c("item1", "item2")
-#' rsa.reason(m, 0)
-#' rsa.reason(m, 2)
+#' rsa.reason(m, depth = 0)
+#' rsa.reason(m, depth = 2)
 #'
 rsa.reason <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), depth = 1, alpha = 1) {
   ## Validation checks
@@ -119,9 +119,6 @@ rsa.reason <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), dep
 #' colnames(m) <- c("item1", "item2")
 #' rsa.fullRecursion(m)
 #' rsa.fullRecursion(rsa.fullRecursion(m))
-#' costs <- matrix(data = c(rep(-0.2, 5), rep(-0.8, 5)), nrow = 5)
-#' rsa.fullRecursion(m, costs)
-#' rsa.fullRecursion(rsa.fullRecursion(m, costs), costs)
 #'
 rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), alpha = 1) {
   ## Validation checks

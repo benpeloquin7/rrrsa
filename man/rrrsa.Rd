@@ -6,15 +6,15 @@
 \alias{rrrsa-package}
 \title{rrrsa package for running Rational speech-act models}
 \description{
-for functions \code{link{reason}} and \code{link{informativity}}.
+for functions \code{link{rsa.reason}} and \code{link{rsa.informativity}}.
 }
 \references{
 Frank \& Goodman (2012)
 \url{http://langcog.stanford.edu/papers_new/frank-2012-science.pdf}
 }
 \seealso{
-\code{\link{reason}}
+\code{\link{rsa.reason}}
 
-\code{link{informativity}}
+\code{link{rsa.informativity}}
 }
 

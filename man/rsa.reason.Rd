@@ -28,8 +28,8 @@ Return matrix after undergoing number 'depth' recursions
 m <- matrix(data = c(0, 0.2, 0.25, 0.25, 0.3, 0, 0, 0, 0.3, 0.7), nrow = 5)
 rownames(m) <- 1:5
 colnames(m) <- c("item1", "item2")
-rsa.reason(m, 0)
-rsa.reason(m, 2)
+rsa.reason(m, depth = 0)
+rsa.reason(m, depth = 2)
 
 }
 \keyword{recursion}

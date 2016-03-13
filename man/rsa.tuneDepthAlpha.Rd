@@ -11,6 +11,8 @@ rsa.tuneDepthAlpha(data, quantityVarName, semanticsVarName, itemVarName,
 \arguments{
 \item{data, }{tidied data}
 
+\item{quantityVarName, }{entity name we're quantifying over}
+
 \item{semanticsVarName, }{semantic values for inference computation}
 
 \item{itemVarName, }{unique items were comparing, probaby words}
@@ -28,8 +30,6 @@ rsa.tuneDepthAlpha(data, quantityVarName, semanticsVarName, itemVarName,
 \item{alphas, }{vector of alphas for tuning}
 
 \item{compareItems, }{specific items (in itemVarName col) for data subsetting}
-
-\item{quanityVarName, }{entity name we're quantifying over}
 }
 \value{
 list of length(alphas) * length(depths) tuples with (correlation, depth, alpha)

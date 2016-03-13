@@ -20,7 +20,9 @@ Convert vector data type
 \examples{
 v1 <- as.factor(c("one", "two", "three"))
 v2 <- c("one", "two", "three")
+v3 <- c("1", "2", "3")
 rsa.convertVecType(v1, v2)
+rsa.convertVecType(v1, v3)
 
 }
 

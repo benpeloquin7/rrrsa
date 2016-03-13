@@ -9,9 +9,9 @@ rsa.utility(items, costs = rep(0, length(items)), alpha = 1)
 \arguments{
 \item{items, }{literal semantic input vector <m_u1, m_u2,..., m_uN>}
 
-\item{alpha, }{decision noise parameter (see 'informativity()')}
+\item{costs, }{cost vector <u1, u2,..., uN>}
 
-\item{cost, }{cost vector <u1, u2,..., uN>}
+\item{alpha, }{decision noise parameter (see 'informativity()')}
 }
 \value{
 return a vector of utilities

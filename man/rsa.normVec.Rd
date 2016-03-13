@@ -10,7 +10,7 @@ rsa.normVec(v)
 \item{v, }{vector to be normalized}
 }
 \value{
-, normalized vector
+a normalized vector
 }
 \description{
 Return a normalized vector

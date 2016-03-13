@@ -10,20 +10,24 @@ rsa.runDf(data, quantityVarName, semanticsVarName, itemVarName,
 \arguments{
 \item{data, }{tidied data}
 
+\item{quantityVarName, }{entity name we're quantifying over
+(i.e. "stars" in Peloquin & Frank (2016))}
+
 \item{semanticsVarName, }{literal listener semantics for RSA computations}
 
-\item{itemVarName, }{unique items were compring, probaby words
+\item{itemVarName, }{unique items were comparing, probaby words
 (i.e. "degrees" in Peloquin & Frank (2016))}
 
 \item{costsVarName, }{costs variable name}
 
 \item{priorsVarName, }{priors variable name}
 
-\item{quanityVarName, }{entity name we're quantifying over
-(i.e. "stars" in Peloquin & Frank (2016))}
+\item{depth, }{recursive depth parameter}
+
+\item{alpha, }{decision noise parameter level}
 }
 \value{
-, return data frame with 'pred' col appended
+data frame with posterior predictions 'preds' column appended
 }
 \description{
 Expects tidied data with three required and two optional fields
@@ -32,6 +36,8 @@ Expects tidied data with three required and two optional fields
 3) semanticsVarName       :: literal listener semantics
 4) optional costsVarName  :: costs
 5) optional priorsVarName :: priors
+rsa-ready, tidied data should have a unique semantic value for each quantity * item combination.
+(see formatting of peloquinFrank_2Alts data).
 }
 \examples{
 rsa.runDf(peloquinFrank_2Alts, "stars", "speaker.p", "words")

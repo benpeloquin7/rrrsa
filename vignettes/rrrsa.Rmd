@@ -1,3 +1,4 @@
+---
 title: "rrrsa"
 author: "Ben Peloquin"
 date: "`r Sys.Date()`"
@@ -8,11 +9,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r}
-library(rrrsa)
-```
-
-
 # Rational speech act model (RSA) of pragmatic inference
 
 `rrrsa` is an R package for running RSA, a Bayesian model of pragmatic inference. Below is a concise tour of some of the things rrrsa can do for you. 
@@ -21,7 +17,7 @@ rrrsa was created by Ben Peloquin.
 
 ## What is RSA?
 
-Rational speech act models formalize language understanding as a special case of social cognition in which `speakers` and `listeners` reason about one another recursively (Frank \& Goodman 2012; Goodman \& Stuhmuller, 2014). That is a `pragmatic listener` $P_{L_n}(m|u)$, reasons about intended meaning $m$ of an utterance $u$ by a `rational speaker`. The likelihood that a `rational speaker` $P_{s_n}(u|m)$ chooses utterances according to the expected utility of an utterance $U(m;u)$. In computing this utility the rational speaker reasons about how the utterance will be interpreted by a listener $P_{L_{n-1}}$. This recursion ground outs in a literal listener who interprets an utterance according to the literal semantics of the utterance $P_{L_0}$.
+Rational speech act models formalize language understanding as a special case of social cognition in which `speakers` and `listeners` reason about one another recursively (Frank \& Goodman 2012; Goodman \& Stuhmuller, 2014). That is a `pragmatic listener` $P_{L_n}(m|u)$, reasons about intended meaning $m$ of an utterance $u$ by a `rational speaker`. The `rational speaker` $P_{s_n}(u|m)$ chooses an utterance $u$ given an intended meaning $m$ according to the expected utility of an utterance $U(m;u)$. In computing this utility the rational speaker reasons about how the utterance will be interpreted by a listener $P_{L_{n-1}}$. This recursion grounds out in a literal listener who interprets an utterance according to the literal semantics of the utterance $P_{L_0}(m|u)$. `alpha` $\alpha$ is a decision noise parameter. As `alpha` $\rightarrow \infty$ the speaker chooses utterance that are maximally informative.
 
 $$P_{L_n}(m|u) \propto P_{S_n}(u|m)P(m)$$
 $$P_{S_n} \propto e^{U(m;u)}$$
@@ -33,9 +29,10 @@ $$U(m;u) = -\alpha(\log(P_{L_{n-1}}(m|u)) - C(u))$$
 
 ### Calculating the informativity an utterance
 
-`rsa.informativity()` takes three arguments, literal semantics $P_{L_0}$, `alpha` level (default 1), and `cost` (default 0). This function returns the suprisal of an utterance minus cost, multiplied by alpha.
+`rsa.informativity()` takes three arguments, literal semantics $P_{L_0}$, `alpha` level (default 1), and `cost` (default 0). This function returns the surprisal of an utterance minus cost, multiplied by alpha.
 
 ```{r}
+library(rrrsa)
 rsa.informativity(0.4)
 rsa.informativity(rsa.informativity(0.4), alpha = 2)
 rsa.informativity(rsa.informativity(0.4), alpha = 2, cost = 0.5)
@@ -57,7 +54,7 @@ rsa.utility(items = literalSemantics, costs = costs, alpha = 9)
 
 ### Computing one full recursion
 
-In the RSA framework one full recursion consists of a `pragmatic listner` $P_{L_1}$ who reasons about a `rational speaker` $P_{s_1}$ who reason about a `literal listener` $P_{L_0}$. Expected input is an $m$ matrix of  $P_{L_0}$ `literal listener` values in which columns corresond to items (words) and rows correspond to semantic quantity (stars in Peloquin & Frank, 2016). Optional arguments include a `costs` vector which whould be the same length as `ncol` and an optional `priors` vector which shoule the same length as `nrows`. `rsa.fullRecursion` provides safety checking for these cases. Output corresponds with pragmatic listener posterior predictions.
+In the RSA framework one full recursion consists of a `pragmatic listner` $P_{L_1}$ who reasons about a `rational speaker` $P_{s_1}$ who reason about a `literal listener` $P_{L_0}$. Expected input is an $m$ matrix of  $P_{L_0}$ `literal listener` values in which columns corresond to items (words) and rows correspond to semantic quantity (stars in Peloquin & Frank, 2016). Optional arguments include a `costs` vector which whould be the same length as `ncol` and an optional `priors` vector which should the same length as `nrows`. `rsa.fullRecursion` provides safety checking for these cases. Output corresponds with pragmatic listener posterior predictions.
 ```{r}
 ## hypothetical input data for scalar items <'none', 'some', 'all'>
 m <- matrix(data = c(1.0, 0.0, 0.0, 0.0, 0.0,
@@ -86,7 +83,7 @@ rsa.reason(m = m, costs = costs, priors = priors, depth = 2)
 
 ### Running data frames
 
-While users have access the model components specified above, most users will want to make use of the `rsa.runDf` function. `rsa.runDf` allows users to run RSA on a tidied data frame and avoid running individual model components individually. An RSA ready, tidied data frame must contian columns for semantic `quantity` (such as stars in Peloquin & Frank, 2016), `item` (such as words) and `semantics` literal listener values where each row corresponds with unique `item`/`quantity` combination. A user should specify their naming convention for these items in the `quantityVarName`, `itemVarName` and `semanticsVarName` arguments. If users also have `costs` or `priors` data available (as columns in the data frame), they smiply need include the `costVarName` and `priorsVarName` variables. Finally, users can also specify values for the `alpha` and `depth` hyperparamenters which will be populated with `alpha` $ = 1$ and uniform priors if not specified. `runDf` will return a data frame with a new model predictions `preds` appended.
+While users have access the model components specified above, most users will want to make use of the `rsa.runDf` function. `rsa.runDf` allows users to run RSA on a tidied data frame and avoid running individual model components individually. An RSA ready, tidied data frame must contian columns for semantic `quantity` (such as stars in Peloquin & Frank, 2016), `item` (such as words) and `semantics` (literal listener values) where each row corresponds with unique `item`/`quantity` combination. A user should specify their naming convention for these items in the `quantityVarName`, `itemVarName` and `semanticsVarName` arguments. If users also have `costs` or `priors` data available (as columns in the data frame), they smiply need include the `costVarName` and `priorsVarName` variables. Finally, users can also specify values for the `alpha` and `depth` hyperparamenters which will be populated with `alpha` $\alpha = 1$ and uniform priors if not specified. The primary implementation challenge for `runDf` is to maintain all meta-data and naming conventions for the argument data frame, without requiring users to comply to specific naming conventions. `runDf` will return a data frame with a new model predictions `preds` column appended.
 
 ```{r}
 ## Hypothetical literal listener data we might want to compute RSA on.
@@ -98,11 +95,10 @@ df <- data.frame(scales = rep("some_all", 15),
                                 0.0, rep(0.25, 4),
                                 1.0, rep(0.0, 4)))
 
-
 rsa.runDf(df, quantityVarName = "stars", semanticsVarName = "listenerSemantics", itemVarName = "words")
 ```
 
-`runDf` maintains all column naming and handle multiple data types (however, the function expects numerical expressions in the `semantics` vector). For example, we can run `runDf` with a character for `quantity`:
+`runDf` maintains all column naming and can handle multiple data types (however, the function expects numerical expressions in the `semantics` vector). For example, we can run `runDf` with a character vector for `quantity` (contrast with the factor vector used above):
 ```{r}
 all(
   rsa.runDf(df, quantityVarName = "starsChar",
@@ -131,7 +127,7 @@ plyr::ddply(.data = df, .variables = c("scales"), rsa.runDf, quantityVarName = "
       semanticsVarName = "listenerSemantics", itemVarName = "words", costsVarName = "costs", depth = 2)
 ```
 
-We can see this more clearly using data from Peloquin & Frank (2016). Here the grouping variable are different scalar familes (5 in total).
+We can see this more clearly using data from Peloquin & Frank (2016). Here the grouping variable are different scalar familes (5 in total) named `scale`.
 ```{r}
 d <- peloquinFrank_2Alts
 head(d)
@@ -147,7 +143,7 @@ tail(
 ```
 
 ### Tuning hyperparamaters
-If a user has `pragmatic judgment` data we can use the `tuneDepthAlpha` function to tune hypeparameters. Calling this function requires the same argument list as a simple `runDf` with the addition of `alphas` and `depths` vectors to iterate over as well as the column of `pragmatic judgments` specified through the `compareDataVarName` argument, which we'll be using as the basis of comparison.
+If a user has `pragmatic judgment` data we can use the `tuneDepthAlpha` function to tune hyperparameters. Calling this function requires the same argument list as a simple `runDf` with the addition of `alphas` and `depths` vectors to iterate over as well as the column of `pragmatic judgments` specified through the `compareDataVarName` argument, which we'll be using as the basis of comparison.
 ```{r}
 d <- peloquinFrank_5Alts
 str(d)
