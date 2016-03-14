@@ -1,5 +1,5 @@
 Package: rrrsa
-Maintainer: Ben peloquin <bpeloqui@stanford.edu>
+Maintainer: Ben Peloquin <bpeloqui@stanford.edu>
 Title: Run Rational Speech Act Models of Pragmatic Inference
 Version: 0.0.0.9000
 Authors@R: person("Ben", "Peloquin", , "bpeloqui@stanford.edu", c("aut", "cre"))

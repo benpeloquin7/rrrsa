@@ -4,7 +4,7 @@
 \name{rrrsa}
 \alias{rrrsa}
 \alias{rrrsa-package}
-\title{rrrsa package for running Rational speech-act models}
+\title{rrrsa package for running Rational Speech Act models}
 \description{
 for functions \code{link{rsa.reason}} and \code{link{rsa.informativity}}.
 }

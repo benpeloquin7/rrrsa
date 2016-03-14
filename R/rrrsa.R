@@ -1,4 +1,4 @@
-#' rrrsa package for running Rational speech-act models
+#' rrrsa package for running Rational Speech Act models
 #'
 #'
 #' for functions \code{link{rsa.reason}} and \code{link{rsa.informativity}}.
