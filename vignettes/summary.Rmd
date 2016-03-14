@@ -4,7 +4,7 @@ author: "Ben Peloquin"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{rrrsa}
+  %\VignetteIndexEntry{summary}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,7 +14,7 @@ vignette: >
 `rrrsa` is an R package for running RSA, a Bayesian model of pragmatic inference. rrrsa was created by Ben Peloquin.
 
 ## What is RSA?
-Rational speech act (RSA) models frmae language understanding as a special case of social cognition in which `speakers` and `listeners` reason about one another recursively. A `pragmatic listener` $P_{L_n}(m|u)$, reasons about intended meaning $m$ of an utterance $u$ by a `rational speaker` $P_{s_n}(u|m)$ who chooses an utterance according to the expected utility of an utterance $U(m;u)$. $\alpha$ is a decision noise parameter.
+Rational speech act (RSA) models frame language understanding as a special case of social cognition in which `speakers` and `listeners` reason about one another recursively. A `pragmatic listener` $P_{L_n}(m|u)$, reasons about intended meaning $m$ of an utterance $u$ by a `rational speaker` $P_{s_n}(u|m)$ who chooses an utterance according to the expected utility of an utterance $U(m;u)$. $\alpha$ is a decision noise parameter.
 
 $$P_{L_n}(m|u) \propto P_{S_n}(u|m)P(m)$$
 $$P_{S_n} \propto e^{U(m;u)}$$
@@ -113,7 +113,7 @@ d <- peloquinFrank_5Alts
 alphas <- seq(1, 3, by = 0.1)
 depths <- 1:3
 ```
-Users may also want to check only a subset of the items in their data frame for tuning. In the case of Peloquin & Frank (2016) we only wanted to tune against `entailment` pairs. The `compareItems` argument allows the user to pass a vector of items check specifically.
+Users may also want to check only a subset of the items in their data frame for tuning. In the case of Peloquin & Frank (2016) we only wanted to tune against `entailment` pairs. The `compareItems` argument allows the user to pass a vector of items for subsetting.
 ```{r warning=FALSE}
 checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
                 "palatable", "delicious")
