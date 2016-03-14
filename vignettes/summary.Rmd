@@ -11,52 +11,37 @@ vignette: >
 
 # Rational speech act model (RSA) of pragmatic inference
 
-`rrrsa` is an R package for running RSA, a Bayesian model of pragmatic inference. Below is a concise tour of some of the things rrrsa can do for you. 
-
-rrrsa was created by Ben Peloquin.
+`rrrsa` is an R package for running RSA, a Bayesian model of pragmatic inference. rrrsa was created by Ben Peloquin.
 
 ## What is RSA?
-
-Rational speech act models formalize language understanding as a special case of social cognition in which `speakers` and `listeners` reason about one another recursively (Frank \& Goodman 2012; Goodman \& Stuhmuller, 2014). That is a `pragmatic listener` $P_{L_n}(m|u)$, reasons about intended meaning $m$ of an utterance $u$ by a `rational speaker`. The `rational speaker` $P_{s_n}(u|m)$ chooses an utterance $u$ given an intended meaning $m$ according to the expected utility of an utterance $U(m;u)$. In computing this utility the rational speaker reasons about how the utterance will be interpreted by a listener $P_{L_{n-1}}$. This recursion grounds out in a literal listener who interprets an utterance according to the literal semantics of the utterance $P_{L_0}(m|u)$. `alpha` $\alpha$ is a decision noise parameter. As `alpha` $\rightarrow \infty$ the speaker chooses utterance that are maximally informative.
+Rational speech act (RSA) models frmae language understanding as a special case of social cognition in which `speakers` and `listeners` reason about one another recursively. A `pragmatic listener` $P_{L_n}(m|u)$, reasons about intended meaning $m$ of an utterance $u$ by a `rational speaker` $P_{s_n}(u|m)$ who chooses an utterance according to the expected utility of an utterance $U(m;u)$. $\alpha$ is a decision noise parameter.
 
 $$P_{L_n}(m|u) \propto P_{S_n}(u|m)P(m)$$
 $$P_{S_n} \propto e^{U(m;u)}$$
 $$U(m;u) = -\alpha(\log(P_{L_{n-1}}(m|u)) - C(u))$$
 
 ## rrrsa includes access to all model components
-
 `rrrsa` provides users with access to all model components. The following sections demonstrate how this functionality can be used.
 
 ### Calculating the informativity an utterance
-
 `rsa.informativity()` takes three arguments, literal semantics $P_{L_0}$, `alpha` level (default 1), and `cost` (default 0). This function returns the surprisal of an utterance minus cost, multiplied by alpha.
-
 ```{r}
 library(rrrsa)
 rsa.informativity(0.4)
-rsa.informativity(rsa.informativity(0.4), alpha = 2)
 rsa.informativity(rsa.informativity(0.4), alpha = 2, cost = 0.5)
 ```
 
 ### Calculating the utility of an utterance
-
 `rsa.utility` takes an input vector of literal listener semantics and outputs a normalized vector of speaker likelihoods. If `costs` are not specified the default 0's vector is used. If `alpha` is not specified a default value of $1$ is used.
 ```{r}
 literalSemantics <- c(0.0, 0.0, 0.3, 0.3, 0.4)
-rsa.utility(items = literalSemantics)
-
 costs <- c(0.0, 0.0, 0.2, 0.3, 0.4)
-rsa.utility(items = literalSemantics, costs = costs)
-
 rsa.utility(items = literalSemantics, costs = costs, alpha = 3)
-rsa.utility(items = literalSemantics, costs = costs, alpha = 9)
 ```
 
 ### Computing one full recursion
-
 In the RSA framework one full recursion consists of a `pragmatic listner` $P_{L_1}$ who reasons about a `rational speaker` $P_{s_1}$ who reason about a `literal listener` $P_{L_0}$. Expected input is an $m$ matrix of  $P_{L_0}$ `literal listener` values in which columns corresond to items (words) and rows correspond to semantic quantity (stars in Peloquin & Frank, 2016). Optional arguments include a `costs` vector which whould be the same length as `ncol` and an optional `priors` vector which should the same length as `nrows`. `rsa.fullRecursion` provides safety checking for these cases. Output corresponds with pragmatic listener posterior predictions.
 ```{r}
-## hypothetical input data for scalar items <'none', 'some', 'all'>
 m <- matrix(data = c(1.0, 0.0, 0.0, 0.0, 0.0,
                      0.0, 0.25, 0.25, 0.25, 0.25,
                      0.0, 0.0, 0.0, 0.0, 1.0), nrow = 5)
@@ -64,26 +49,18 @@ colnames(m) <- c("none", "some", "all")
 rownames(m) <- 1:5
 costs <- c("none" = 4, "some" = 4, "all" = 3)
 priors <- rnorm(n = nrow(m), mean = 0.5, sd = 0.1)
-
-rsa.fullRecursion(m = m)  ## only literal semantics
-rsa.fullRecursion(m = m, costs = costs) ## literal semantics and cost
-rsa.fullRecursion(m = m, costs = costs, priors = priors) ## literal semantics, costs, priors
+rsa.fullRecursion(m = m, costs = costs, priors = priors)
 ```
 
 ### Running multiple recursions
-
 `rsa.reason` is really a wrapper function for `rsa.fullRecursion` which provides an additional `depth` parameter which specifies the recursive depth during reasoning. If depth is not provided, default value is $1$.
 ```{r}
-all(rsa.reason(m = m) == rsa.fullRecursion(m = m))
 all(rsa.reason(m = m, depth = 2) == rsa.fullRecursion(rsa.fullRecursion(m = m)))
-rsa.reason(m = m, depth = 2)
-rsa.reason(m = m, depth = 10)
 rsa.reason(m = m, costs = costs, priors = priors, depth = 2)
 ```
 
 ### Running data frames
-
-While users have access the model components specified above, most users will want to make use of the `rsa.runDf` function. `rsa.runDf` allows users to run RSA on a tidied data frame and avoid running individual model components individually. An RSA ready, tidied data frame must contian columns for semantic `quantity` (such as stars in Peloquin & Frank, 2016), `item` (such as words) and `semantics` (literal listener values) where each row corresponds with unique `item`/`quantity` combination. A user should specify their naming convention for these items in the `quantityVarName`, `itemVarName` and `semanticsVarName` arguments. If users also have `costs` or `priors` data available (as columns in the data frame), they smiply need include the `costVarName` and `priorsVarName` variables. Finally, users can also specify values for the `alpha` and `depth` hyperparamenters which will be populated with `alpha` $\alpha = 1$ and uniform priors if not specified. The primary implementation challenge for `runDf` is to maintain all meta-data and naming conventions for the argument data frame, without requiring users to comply to specific naming conventions. `runDf` will return a data frame with a new model predictions `preds` column appended.
+ Run RSA on a tidied data frame and avoid running individual model components individually with `rsa.runDf`. An RSA-ready, tidied data frame must contian columns for semantic `quantity`, `item` and `semantics`, where each row corresponds with unique `item`/`quantity` combination. A user should specify their naming convention for these items in the `quantityVarName`, `itemVarName` and `semanticsVarName` arguments. The `costVarName` and `priorsVarName` args correspond with `costs` and/or `priors` data. Users can specify values for `alpha` and `depth` hyperparamenters. `runDf` will return a data frame with a new model predictions `preds` column appended.
 
 ```{r}
 ## Hypothetical literal listener data we might want to compute RSA on.
@@ -94,24 +71,19 @@ df <- data.frame(scales = rep("some_all", 15),
                   listenerSemantics = c(rep(0.0, 4), 1.0,
                                 0.0, rep(0.25, 4),
                                 1.0, rep(0.0, 4)))
-
-rsa.runDf(df, quantityVarName = "stars", semanticsVarName = "listenerSemantics", itemVarName = "words")
+head(rsa.runDf(df, quantityVarName = "stars", semanticsVarName = "listenerSemantics", itemVarName = "words"), n = 3)
 ```
-
-`runDf` maintains all column naming and can handle multiple data types (however, the function expects numerical expressions in the `semantics` vector). For example, we can run `runDf` with a character vector for `quantity` (contrast with the factor vector used above):
+Importantly, `runDf` maintains all column naming and can handle multiple data types. For example, we can run `runDf` with a character vector for `quantity` (contrast with the factor vector used above):
 ```{r}
-all(
-  rsa.runDf(df, quantityVarName = "starsChar",
+all(rsa.runDf(df, quantityVarName = "starsChar",
               semanticsVarName = "listenerSemantics",
             itemVarName = "words") ==
-  rsa.runDf(df, quantityVarName = "stars",
+       rsa.runDf(df, quantityVarName = "stars",
             semanticsVarName = "listenerSemantics",
-            itemVarName = "words")
-  )
+            itemVarName = "words"))
 ```
-
 A frequent use case for RSA will require running RSA over multiple groups of data. Rather than subsetting data frames and running RSA iteratively, we recommend using `ddply` from the `plyr` package. Users can supply the grouping variable in ddply's `.vars` argument
-```{r}
+```{r message=FALSE}
 library(dplyr)
 df <- data.frame(scales = c(rep("some_all", 10), rep("good_excellent", 10)),
                   stars = as.factor(rep(1:5, 4)),
@@ -119,49 +91,37 @@ df <- data.frame(scales = c(rep("some_all", 10), rep("good_excellent", 10)),
                   listenerSemantics = c(rep(0.0, 4), 1.0,
                                 0.0, rep(0.25, 4),
                                 rep(0.0, 4), 1.0,
-                                0.0, rep(0.25, 4))) %>%
-  mutate(priors = 0.20)
+                                0.0, rep(0.25, 4))) %>% mutate(priors = 0.20)
 df$costs <- c(rep(3, 5), rep(4, 5), rep(9, 5), rep(4, 5))
 
-plyr::ddply(.data = df, .variables = c("scales"), rsa.runDf, quantityVarName = "stars",
-      semanticsVarName = "listenerSemantics", itemVarName = "words", costsVarName = "costs", depth = 2)
+tail(plyr::ddply(.data = df, .variables = c("scales"), rsa.runDf, quantityVarName = "stars",
+      semanticsVarName = "listenerSemantics", itemVarName = "words", costsVarName = "costs", depth = 2), n = 3)
 ```
-
 We can see this more clearly using data from Peloquin & Frank (2016). Here the grouping variable are different scalar familes (5 in total) named `scale`.
 ```{r}
 d <- peloquinFrank_2Alts
-head(d)
-str(d)
-head(
-  plyr::ddply(.data = d, .variables = c("scale"), rsa.runDf, quantityVarName = "stars",
-              semanticsVarName = "speaker.p", itemVarName = "words")
-)
-tail(
-  plyr::ddply(.data = d, .variables = c("scale"), rsa.runDf, quantityVarName = "stars",
-              semanticsVarName = "speaker.p", itemVarName = "words")
-)
+head(plyr::ddply(.data = d, .variables = c("scale"), rsa.runDf, quantityVarName = "stars",
+              semanticsVarName = "speaker.p", itemVarName = "words"), n = 3)
+tail(plyr::ddply(.data = d, .variables = c("scale"), rsa.runDf, quantityVarName = "stars",
+              semanticsVarName = "speaker.p", itemVarName = "words"), n = 3)
 ```
 
 ### Tuning hyperparamaters
 If a user has `pragmatic judgment` data we can use the `tuneDepthAlpha` function to tune hyperparameters. Calling this function requires the same argument list as a simple `runDf` with the addition of `alphas` and `depths` vectors to iterate over as well as the column of `pragmatic judgments` specified through the `compareDataVarName` argument, which we'll be using as the basis of comparison.
 ```{r}
 d <- peloquinFrank_5Alts
-str(d)
 alphas <- seq(1, 3, by = 0.1)
 depths <- 1:3
 ```
 Users may also want to check only a subset of the items in their data frame for tuning. In the case of Peloquin & Frank (2016) we only wanted to tune against `entailment` pairs. The `compareItems` argument allows the user to pass a vector of items check specifically.
-```{r}
+```{r warning=FALSE}
 checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
                 "palatable", "delicious")
-```
-
-```{r warning=FALSE}
 results <- rsa.tuneDepthAlpha(data = d, groupName = "scale", 
                      quantityVarName = "stars", itemVarName = "words",
                      semanticsVarName = "speaker.p", compareDataName = "e11",
                      compareItems = checkWords, alphas = alphas, depths = depths)
-head(results)
+head(results, n = 3)
 ```
 `rsa.tuneDepthAlpha` returns a list of (`correlation`, `depth`, `alpha`) tuples which an be used for plotting or users can simply sort to find the hyperparamter combination leading to best model fit.
 ```{r}
