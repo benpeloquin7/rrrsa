@@ -4,17 +4,28 @@
 \name{rrrsa}
 \alias{rrrsa}
 \alias{rrrsa-package}
-\title{rrrsa package for running Rational Speech Act models}
+\title{run Rational Speech Act (RSA) models}
 \description{
-for functions \code{link{rsa.reason}} and \code{link{rsa.informativity}}.
+rrrsa provides tools for running RSA models.
+These tools are grouped below for basic RSA reasoning functionality
+as well as handling data frames.
+}
+\details{
+Reasoning
+
+rrrsa's reasoning is broken down into model components made available to users.
+Calculating informativity \code{\link{rsa.informativity}}, calculating
+speaker utility \code{\link{rsa.utility}}, running one full RSA recursion
+\code{\link{rsa.fullRecursion}}, running multiple recursions \code{\link{rsa.reason}}.
+
+Data frames and tuning hypeparameters
+
+rrrsa provides easy functionality for data in data frames with \code{\link{rsa.runDf}},
+as well as for tuning hyperparamters \code{\link{rsa.tuneDepthAlpha}}
 }
 \references{
-Frank \& Goodman (2012)
-\url{http://langcog.stanford.edu/papers_new/frank-2012-science.pdf}
-}
-\seealso{
-\code{\link{rsa.reason}}
+Frank & Goodman (2012); Goodman & Stuhmuller, (2014); Peloquin & Frank (2016)
 
-\code{link{rsa.informativity}}
+\url{https://github.com/benpeloquin7/rrrsa}
 }
 

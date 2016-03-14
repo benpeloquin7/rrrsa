@@ -1,17 +1,23 @@
 #' Run RSA on a tidied data frame (assumes one group)
 #'
-#' Expects tidied data with three required and two optional fields
+#' Expects tidied data with three required (1-3) and two optional fields (4, 5)
+#'
 #' 1) quanityVarName         :: entity name we're quantifying over
+#'
 #' 2) itemVarName            :: unique items were considering,
+#'
 #' 3) semanticsVarName       :: literal listener semantics
+#'
 #' 4) optional costsVarName  :: costs
+#'
 #' 5) optional priorsVarName :: priors
+#'
 #' rsa-ready, tidied data should have a unique semantic value for each quantity * item combination.
 #' (see formatting of peloquinFrank_2Alts data).
 #' @param data, tidied data
 #' @param quantityVarName, entity name we're quantifying over
 #' (i.e. "stars" in Peloquin & Frank (2016))
-#' @param semanticsVarName, literal listener semantics for RSA computations
+#' @param semanticsVarName, literal listener semantic values for RSA computations
 #' @param itemVarName, unique items were comparing, probaby words
 #' (i.e. "degrees" in Peloquin & Frank (2016))
 #' @param costsVarName, costs variable name

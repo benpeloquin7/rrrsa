@@ -15,7 +15,7 @@ from optimal action selection)}
 \item{cost, }{cost of utterance u}
 }
 \value{
-, inormativity of utterance u given meaning m and cost
+Informativity of utterance u given meaning m and cost
 }
 \description{
 Calculate: e^(-alpha * (-log(p(m|u)) - cost))

@@ -13,7 +13,7 @@ rsa.runDf(data, quantityVarName, semanticsVarName, itemVarName,
 \item{quantityVarName, }{entity name we're quantifying over
 (i.e. "stars" in Peloquin & Frank (2016))}
 
-\item{semanticsVarName, }{literal listener semantics for RSA computations}
+\item{semanticsVarName, }{literal listener semantic values for RSA computations}
 
 \item{itemVarName, }{unique items were comparing, probaby words
 (i.e. "degrees" in Peloquin & Frank (2016))}
@@ -30,12 +30,19 @@ rsa.runDf(data, quantityVarName, semanticsVarName, itemVarName,
 data frame with posterior predictions 'preds' column appended
 }
 \description{
-Expects tidied data with three required and two optional fields
+Expects tidied data with three required (1-3) and two optional fields (4, 5)
+}
+\details{
 1) quanityVarName         :: entity name we're quantifying over
+
 2) itemVarName            :: unique items were considering,
+
 3) semanticsVarName       :: literal listener semantics
+
 4) optional costsVarName  :: costs
+
 5) optional priorsVarName :: priors
+
 rsa-ready, tidied data should have a unique semantic value for each quantity * item combination.
 (see formatting of peloquinFrank_2Alts data).
 }

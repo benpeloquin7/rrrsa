@@ -67,11 +67,11 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
 #'
 #' Return matrix after undergoing number 'depth' recursions
 #' @param m, matrix of semantics with 'items' cols and 'quantity' rows
-#' @param costs, length m vector of costs (default is 0 valued vector)
-#' @param priors, default uniform, vector of length nrow() (semantic quantity)
+#' @param costs, ncol(m) vector of costs (default is 0 valued vector)
+#' @param priors, nrow(m) vector of priors (default is uniform)
 #' @param depth, number of recursions
 #' @param alpha, decision hyper-parameter
-#' @return return a matrix of posteriors
+#' @return matrix of posterior values
 #' @keywords recursion
 #' @export
 #' @examples
@@ -107,8 +107,8 @@ rsa.reason <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), dep
 #' Run one full recursion between listener -> speaker -> listener
 #'
 #' @param m, matrix of semantics (rows = meaning (m rows), cols = words (n cols))
-#' @param costs, length m vector of costs (default is 0 valued vector)
-#' @param priors, default uniform, vector of length nrow() [semantic quantity]
+#' @param costs, ncol(m) vector of costs (default is 0 valued vector)
+#' @param priors, nrow(m) vector of priors (default is uniform)
 #' @param alpha, decision hyper-param
 #' @return matrix of posterior values
 #' @keywords recursion
@@ -195,7 +195,7 @@ rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
 #' @param alpha, decision noise parameter (speaker's deviation
 #' from optimal action selection)
 #' @param cost, cost of utterance u
-#' @return, inormativity of utterance u given meaning m and cost
+#' @return Informativity of utterance u given meaning m and cost
 #' @keywords surprisal
 #' @export
 #' @examples

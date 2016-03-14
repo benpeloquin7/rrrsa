@@ -10,16 +10,16 @@ rsa.reason(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)),
 \arguments{
 \item{m, }{matrix of semantics with 'items' cols and 'quantity' rows}
 
-\item{costs, }{length m vector of costs (default is 0 valued vector)}
+\item{costs, }{ncol(m) vector of costs (default is 0 valued vector)}
 
-\item{priors, }{default uniform, vector of length nrow() (semantic quantity)}
+\item{priors, }{nrow(m) vector of priors (default is uniform)}
 
 \item{depth, }{number of recursions}
 
 \item{alpha, }{decision hyper-parameter}
 }
 \value{
-return a matrix of posteriors
+matrix of posterior values
 }
 \description{
 Return matrix after undergoing number 'depth' recursions

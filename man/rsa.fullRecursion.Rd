@@ -10,9 +10,9 @@ rsa.fullRecursion(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)),
 \arguments{
 \item{m, }{matrix of semantics (rows = meaning (m rows), cols = words (n cols))}
 
-\item{costs, }{length m vector of costs (default is 0 valued vector)}
+\item{costs, }{ncol(m) vector of costs (default is 0 valued vector)}
 
-\item{priors, }{default uniform, vector of length nrow() [semantic quantity]}
+\item{priors, }{nrow(m) vector of priors (default is uniform)}
 
 \item{alpha, }{decision hyper-param}
 }
