@@ -3,9 +3,9 @@
 \docType{data}
 \name{peloquinFrank_2Alts}
 \alias{peloquinFrank_2Alts}
-\title{Two alternative model data from Peloquin and Frank 2016}
+\title{Two alternatives data from Peloquin and Frank 2016}
 \description{
-Two alternative model data from Peloquin and Frank 2016
+Two alternatives data from Peloquin and Frank 2016
 }
 \keyword{data}
 
