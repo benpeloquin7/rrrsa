@@ -1,3 +1,43 @@
+#' Wrapper to tunDepthAlpha
+#'
+#' Return best model run (correlation, depth, alpha) tuple
+#' each element includes a tuple of (correlation, alpha, depth).
+#' @param data, tidied data
+#' @param quantityVarName, entity name we're quantifying over
+#' @param semanticsVarName, semantic values for inference computation
+#' @param itemVarName, unique items were comparing, probaby words
+#' @param groupName, grouping variable if we have one
+#' @param compareDataName, pragmatic judgments we're comparing to
+#' @param costsVarName, costs variable name
+#' @param priorsVarName, priors variable name
+#' @param depths, vector of depths (in integers) for tuning
+#' @param alphas, vector of alphas for tuning
+#' @param compareItems, specific items (in itemVarName col) for data subsetting
+#' @return list of length(alphas) * length(depths) tuples with (correlation, depth, alpha)
+#' @keywords data tuning
+#' @export
+#' @examples
+#' d <- peloquinFrank_5Alts
+#' alphas <- seq(1, 3, by = 0.1)
+#' depths <- 1:3
+#' checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
+#' "palatable", "delicious")
+#' bestModel <- rsa.bestFit(data = d, groupName = "scale",
+#' quantityVarName = "stars", itemVarName = "words",
+#' semanticsVarName = "speaker.p", compareDataName = "e11",
+#' compareItems = checkWords, alphas = alphas, depths = depths)
+#'
+rsa.bestFit <- function(data, quantityVarName, semanticsVarName, itemVarName, groupName = NA, compareDataName,
+                    costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareItems = NA) {
+  tuning <- rsa.tuneDepthAlpha(data, quantityVarName = quantityVarName,
+                               semanticsVarName = semanticsVarName, itemVarName = itemVarName,
+                               groupName = groupName, compareDataName = compareDataName, compareItems = compareItems,
+                               priorsVarName = priorsVarName, costsVarName = costsVarName,
+                               alphas = alphas, depths = depths)
+  loc <- which.max(sapply(tuning, FUN = function(i) i[[1]]))
+  return(tuning[loc])
+}
+
 #' Tune depth and alpha hyperparamters
 #'
 #' Return a list with number of alpha * depths elements
