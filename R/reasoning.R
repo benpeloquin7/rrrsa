@@ -51,9 +51,10 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
             cors[[counter]] <- c(cor = cor(currRun[, compareDataName],
                                            currRun[, "preds"]), depth = d, alpha = a)
           } else {
-            compareRows <- sapply(data[, itemVarName], function(i) i %in% compareItems)
-            cors[[counter]] <- c(cor = cor(currRun[compareRows, compareDataName],
-                                           currRun[compareRows, "preds"]), depth = d, alpha = a)
+            # compareRows <- which(sapply(data[, itemVarName], function(i) i %in% compareItems) == TRUE)
+            compareData <- subset(currRun, words %in% compareItems)
+            cors[[counter]] <- c(cor = cor(compareData[, compareDataName],
+                                           compareData[, "preds"]), depth = d, alpha = a)
           }
 
         counter <- counter + 1
