@@ -74,8 +74,7 @@ rsa.bestFit <- function(data, quantityVarName, semanticsVarName, itemVarName, gr
 rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarName, groupName = NA, compareDataName,
                                costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareItems = NA) {
 
-  counter <- 1
-  cors <- data.frame(cor = c(), depth = c(), alpha = c())
+  cors <- data.frame(cor = NA, depth = NA, alpha = NA)
   ## running multiple groups
   if (!is.na(groupName)) {
     for (a in alphas) {
@@ -95,12 +94,11 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
             res <- c(cor = cor(compareData[, compareDataName], compareData[, "preds"]), depth = d, alpha = a)
             cors <- rbind(cors, res)
           }
-
-        counter <- counter + 1
       }
     }
   }
-  cors
+  cors <- na.omit(cors)
+  cors[order(-cors$cor), ]
 }
 
 #' Run (multiple) iterations RSA
