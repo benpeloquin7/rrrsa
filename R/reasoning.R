@@ -75,7 +75,7 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
                                costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareItems = NA) {
 
   counter <- 1
-  cors <- list()
+  cors <- data.frame(cor = c(), depth = c(), alpha = c())
   ## running multiple groups
   if (!is.na(groupName)) {
     for (a in alphas) {
@@ -88,13 +88,12 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
                                  priorsVarName = priorsVarName,
                                  depth = d, alpha = a)
           if (length(compareItems) == 1 & is.na(compareItems[1])) {
-            cors[[counter]] <- c(cor = cor(currRun[, compareDataName],
-                                           currRun[, "preds"]), depth = d, alpha = a)
+            res <- c(cor = cor(currRun[, compareDataName], currRun[, "preds"]), depth = d, alpha = a)
+            cors <- rbind(cors, res)
           } else {
-            # compareRows <- which(sapply(data[, itemVarName], function(i) i %in% compareItems) == TRUE)
             compareData <- subset(currRun, words %in% compareItems)
-            cors[[counter]] <- c(cor = cor(compareData[, compareDataName],
-                                           compareData[, "preds"]), depth = d, alpha = a)
+            res <- c(cor = cor(compareData[, compareDataName], compareData[, "preds"]), depth = d, alpha = a)
+            cors <- rbind(cors, res)
           }
 
         counter <- counter + 1
