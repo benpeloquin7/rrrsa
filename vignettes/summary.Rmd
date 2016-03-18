@@ -41,22 +41,43 @@ rsa.utility(items = literalSemantics, costs = costs, alpha = 3)
 
 ### Computing one full recursion
 In the RSA framework one full recursion consists of a `pragmatic listner` $P_{L_1}$ who reasons about a `rational speaker` $P_{s_1}$ who reason about a `literal listener` $P_{L_0}$. Expected input is an $m$ matrix of  $P_{L_0}$ `literal listener` values in which columns corresond to items (words) and rows correspond to semantic quantity (stars in Peloquin & Frank, 2016). Optional arguments include a `costs` vector which whould be the same length as `ncol` and an optional `priors` vector which should the same length as `nrows`. `rsa.fullRecursion` provides safety checking for these cases. Output corresponds with pragmatic listener posterior predictions.
-```{r}
+```{r fig.height=8, fig.width=6}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
 m <- matrix(data = c(1.0, 0.0, 0.0, 0.0, 0.0,
                      0.0, 0.25, 0.25, 0.25, 0.25,
                      0.0, 0.0, 0.0, 0.0, 1.0), nrow = 5)
 colnames(m) <- c("none", "some", "all")
 rownames(m) <- 1:5
-costs <- c("none" = 4, "some" = 4, "all" = 3)
-priors <- rnorm(n = nrow(m), mean = 0.5, sd = 0.1)
-rsa.fullRecursion(m = m, costs = costs, priors = priors)
+# costs <- c("none" = 0, "some" = 0, "all" = 0)
+# priors <- rnorm(n = nrow(m), mean = 0.5, sd = 0.1)
+res <- rsa.fullRecursion(m = m)
+res <- as.data.frame(res) %>%
+  mutate(quantity = rownames(.))
+
+pragmaticsTidied <- res %>%
+  gather(word, pragmatics, -quantity)
+semanticsTidied <- as.data.frame(m) %>%
+  mutate(quantity = rownames(.)) %>%
+  gather(word, semantics, c(none, some, all))
+fullData <- merge(pragmaticsTidied, semanticsTidied) %>%
+  gather(type, value, c(pragmatics, semantics)) %>%
+  mutate(quantity = as.numeric(quantity),
+         lineSize = ifelse(word == "some", 2, 1))
+
+ggplot(fullData, aes(x = quantity, y = value, col = word)) +
+  geom_line(aes(size=lineSize)) +
+  facet_wrap(~type)
+
 ```
 
 ### Running multiple recursions
 `rsa.reason` is really a wrapper function for `rsa.fullRecursion` which provides an additional `depth` parameter which specifies the recursive depth during reasoning. If depth is not provided, default value is $1$.
 ```{r}
 all(rsa.reason(m = m, depth = 2) == rsa.fullRecursion(rsa.fullRecursion(m = m)))
-rsa.reason(m = m, costs = costs, priors = priors, depth = 2)
+rsa.reason(m = m, depth = 2)
 ```
 
 ### Running data frames
@@ -71,7 +92,7 @@ df <- data.frame(scales = rep("some_all", 15),
                   listenerSemantics = c(rep(0.0, 4), 1.0,
                                 0.0, rep(0.25, 4),
                                 1.0, rep(0.0, 4)))
-head(rsa.runDf(df, quantityVarName = "stars", semanticsVarName = "listenerSemantics", itemVarName = "words"), n = 3)
+rsa.runDf(df, quantityVarName = "stars", semanticsVarName = "listenerSemantics", itemVarName = "words")
 ```
 Importantly, `runDf` maintains all column naming and can handle multiple data types. For example, we can run `runDf` with a character vector for `quantity` (contrast with the factor vector used above):
 ```{r}
@@ -110,7 +131,7 @@ tail(plyr::ddply(.data = d, .variables = c("scale"), rsa.runDf, quantityVarName 
 If a user has `pragmatic judgment` data we can use the `tuneDepthAlpha` function to tune hyperparameters. Calling this function requires the same argument list as a simple `runDf` with the addition of `alphas` and `depths` vectors to iterate over as well as the column of `pragmatic judgments` specified through the `compareDataVarName` argument, which we'll be using as the basis of comparison.
 ```{r}
 d <- peloquinFrank_5Alts
-alphas <- seq(1, 3, by = 0.1)
+alphas <- seq(1, 5, by = 0.1)
 depths <- 1:3
 ```
 Users may also want to check only a subset of the items in their data frame for tuning. In the case of Peloquin & Frank (2016) we only wanted to tune against `entailment` pairs. The `compareItems` argument allows the user to pass a vector of items for subsetting.
@@ -121,10 +142,24 @@ results <- rsa.tuneDepthAlpha(data = d, groupName = "scale",
                      quantityVarName = "stars", itemVarName = "words",
                      semanticsVarName = "speaker.p", compareDataName = "e11",
                      compareItems = checkWords, alphas = alphas, depths = depths)
-head(results, n = 3)
 ```
-`rsa.tuneDepthAlpha` returns a list of (`correlation`, `depth`, `alpha`) tuples which an be used for plotting or users can simply sort to find the hyperparamter combination leading to best model fit.
-```{r}
-best <- which.max(unlist(lapply(results, function(i) i[[1]][1])))
-results[[best]]
+`rsa.tuneDepthAlpha` returns a list of (`correlation`, `depth`, `alpha`) tuples which an be used for plotting or users can simply sort to find the hyperparamter combination leading to best model fit. Let's take a look at the tuning.
+```{r fig.height=8, fig.width=6}
+ggplot(results, aes(x = alpha, y = cor, col = as.factor(depth))) +
+  geom_point(size = 3) +
+  geom_vline(aes(xintercept = results$alpha[1],
+             colour = "red",
+             linetype = "longdash"))
+```
+
+Let's take a look at how RSA performs...
+```{r fig.height=8, fig.width=6}
+bestModel <- plyr::ddply(.data = peloquinFrank_5Alts, .variables = c("scale"), rsa.runDf, quantityVarName = "stars",
+              semanticsVarName = "speaker.p", itemVarName = "words", alpha = 4.5) %>%
+  filter(words %in% checkWords)
+
+ggplot(bestModel, aes(x = stars, y = e11, col=words)) +
+  geom_point(size=5, alpha=0.5) +
+  facet_wrap(~scale) +
+  geom_line(aes(y = preds), size=1, lty=4)
 ```
