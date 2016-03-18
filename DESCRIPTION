@@ -13,5 +13,6 @@ License: GPL (>= 2)
 RoxygenNote: 5.0.1
 Suggests: testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    ggplot2
 VignetteBuilder: knitr
