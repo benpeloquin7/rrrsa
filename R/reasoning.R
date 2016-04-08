@@ -89,12 +89,16 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
                                  priorsVarName = priorsVarName,
                                  depth = d, alpha = a)
           if (length(compareIndices) == 1 & is.na(compareIndices[1])) {
-            res <- c(cor = cor(currRun[, compareDataName], currRun[, "preds"]), depth = d, alpha = a)
+            res <- c(cor = cor(currRun[, compareDataName],
+                               currRun[, "preds"], use = "pairwise.complete.obs"),
+                     depth = d, alpha = a)
             cors <- rbind(cors, res)
           } else {
             compareData <- currRun[compareIndices, ]
             # compareData <- subset(currRun, words %in% compareItems)
-            res <- c(cor = cor(compareData[, compareDataName], compareData[, "preds"]), depth = d, alpha = a)
+            res <- c(cor = cor(compareData[, compareDataName],
+                               compareData[, "preds"], use = "pairwise.complete.obs"),
+                     depth = d, alpha = a)
             cors <- rbind(cors, res)
           }
       }
