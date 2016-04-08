@@ -110,9 +110,10 @@ test_that("rsa.tuneDepthAlpha returns valid values", {
   depths <- 1:3
   checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
                   "palatable", "delicious")
+  compareIndices <- which(peloquinFrank_5Alts$words %in% checkWords)
   results <- rsa.tuneDepthAlpha(data = d, groupName = "scale",
                                 quantityVarName = "stars", itemVarName = "words",
                                 semanticsVarName = "speaker.p", compareDataName = "e11",
-                                compareItems = checkWords, alphas = alphas, depths = depths)
-  expect_equal(length(results), length(alphas) * length(depths))
+                                compareIndices = compareIndices, alphas = alphas, depths = depths)
+  expect_equal(nrow(results), length(alphas) * length(depths))
 })

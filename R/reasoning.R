@@ -12,7 +12,7 @@
 #' @param priorsVarName, priors variable name
 #' @param depths, vector of depths (in integers) for tuning
 #' @param alphas, vector of alphas for tuning
-#' @param compareItems, specific items (in itemVarName col) for data subsetting
+#' @param compareIndices, specific indices in data frame
 #' @return list of length(alphas) * length(depths) tuples with (correlation, depth, alpha)
 #' @keywords data tuning
 #' @export
@@ -22,16 +22,17 @@
 #' depths <- 1:3
 #' checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
 #' "palatable", "delicious")
+#' compareIndices <- which(peloquinFrank_5Alts$words %in% checkWords)
 #' bestModel <- rsa.bestFit(data = d, groupName = "scale",
 #' quantityVarName = "stars", itemVarName = "words",
 #' semanticsVarName = "speaker.p", compareDataName = "e11",
-#' compareItems = checkWords, alphas = alphas, depths = depths)
+#' compareIndices = compareIndices, alphas = alphas, depths = depths)
 #'
 rsa.bestFit <- function(data, quantityVarName, semanticsVarName, itemVarName, groupName = NA, compareDataName,
-                    costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareItems = NA) {
+                    costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareIndices = NA) {
   tuning <- rsa.tuneDepthAlpha(data, quantityVarName = quantityVarName,
                                semanticsVarName = semanticsVarName, itemVarName = itemVarName,
-                               groupName = groupName, compareDataName = compareDataName, compareItems = compareItems,
+                               groupName = groupName, compareDataName = compareDataName, compareIndices = compareIndices,
                                priorsVarName = priorsVarName, costsVarName = costsVarName,
                                alphas = alphas, depths = depths)
   loc <- which.max(sapply(tuning, FUN = function(i) i[[1]]))
@@ -53,7 +54,7 @@ rsa.bestFit <- function(data, quantityVarName, semanticsVarName, itemVarName, gr
 #' @param priorsVarName, priors variable name
 #' @param depths, vector of depths (in integers) for tuning
 #' @param alphas, vector of alphas for tuning
-#' @param compareItems, specific items (in itemVarName col) for data subsetting
+#' @param compareIndices, specific indices in data frame
 #' @return list of length(alphas) * length(depths) tuples with (correlation, depth, alpha)
 #' @keywords data tuning
 #' @export
@@ -63,16 +64,17 @@ rsa.bestFit <- function(data, quantityVarName, semanticsVarName, itemVarName, gr
 #' depths <- 1:3
 #' checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
 #' "palatable", "delicious")
+#' compareIndices <- which(peloquinFrank_5Alts$words %in% checkWords)
 #' results <- rsa.tuneDepthAlpha(data = d, groupName = "scale",
 #' quantityVarName = "stars", itemVarName = "words",
 #' semanticsVarName = "speaker.p", compareDataName = "e11",
-#' compareItems = checkWords, alphas = alphas, depths = depths)
+#' compareIndices = compareIndices, alphas = alphas, depths = depths)
 #' head(results)
 #' best <- which.max(unlist(lapply(results, function(i) i[[1]][1])))
 #' results[[best]]
 #'
 rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarName, groupName = NA, compareDataName,
-                               costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareItems = NA) {
+                               costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareIndices = NA) {
 
   cors <- data.frame(cor = NA, depth = NA, alpha = NA)
   ## running multiple groups
@@ -86,11 +88,12 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
                                  costsVarName = costsVarName,
                                  priorsVarName = priorsVarName,
                                  depth = d, alpha = a)
-          if (length(compareItems) == 1 & is.na(compareItems[1])) {
+          if (length(compareIndices) == 1 & is.na(compareIndices[1])) {
             res <- c(cor = cor(currRun[, compareDataName], currRun[, "preds"]), depth = d, alpha = a)
             cors <- rbind(cors, res)
           } else {
-            compareData <- subset(currRun, words %in% compareItems)
+            compareData <- currRun[compareIndices, ]
+            # compareData <- subset(currRun, words %in% compareItems)
             res <- c(cor = cor(compareData[, compareDataName], compareData[, "preds"]), depth = d, alpha = a)
             cors <- rbind(cors, res)
           }

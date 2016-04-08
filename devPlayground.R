@@ -12,29 +12,42 @@ devtools::document(paste(path, "rrrsa", sep = ""))
 devtools::install(pkg=paste(path, "rrrsa", sep = ""), build_vignettes = TRUE)
 devtools::check(pkg = paste(path, "rrrsa", sep = ""))
 devtools::build(pkg = paste(path, "rrrsa", sep = ""))
-
-
-install.packages("/Users/benpeloquin/Desktop/Projects/rrrsa_0.0.0.9000.tar.gz", repos = NULL, type = "source")
-
 remove.packages("rrrsa")
 installed.packages()
 library(rrrsa)
+vignette("summary", "rrrsa")
 
-rrrsa::rsa.runDf()
-plyr::ddply(.data = peloquinFrank_5Alts, .variables = c("scale"), rsa.runDf,
-            quantityVarName = "stars", semanticsVarName = "speaker.p",
-            itemVarName = "words")
+
+head(peloquinFrank_5Alts)
 
 checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
                 "palatable", "delicious")
-results <- rsa.tuneDepthAlpha(peloquinFrank_2Alts, quantityVarName = "stars", semanticsVarName = "speaker.p",
+fiveAltsRes <- plyr::ddply(.data = peloquinFrank_5Alts, .variables = c("scale"), rsa.runDf,
+            quantityVarName = "stars", semanticsVarName = "speaker.p",
+            itemVarName = "words", alpha = 4)
+cor(subset(fiveAltsRes, words %in% checkWords)$preds, subset(fiveAltsRes, words %in% checkWords)$e11)
+cor(subset(fiveAltsRes, words %in% checkWords)$preds, subset(fiveAltsRes, words %in% checkWords)$e6)
+
+fourAltsRes <- plyr::ddply(.data = peloquinFrank_4Alts, .variables = c("scale"), rsa.runDf,
+                        quantityVarName = "stars", semanticsVarName = "speaker.p",
+                        itemVarName = "words", alpha = 4)
+cor(subset(fourAltsRes, words %in% checkWords)$preds, subset(fourAltsRes, words %in% checkWords)$e11)
+cor(subset(fourAltsRes, words %in% checkWords)$preds, subset(fourAltsRes, words %in% checkWords)$e6)
+
+
+cor(fiveAlts[[1]]$preds, fiveAlts[[1]]$listener.p)
+
+
+
+
+results <- rsa.tuneDepthAlpha(peloquinFrank_5Alts, quantityVarName = "stars", semanticsVarName = "speaker.p",
                    itemVarName = "words", groupName = "scale", compareDataName = "e11",
-                   compareItems = checkWords, alphas = seq(1, 4, by = 0.1))
+                   compareItems = checkWords, alphas = seq(1, 5, by = 0.1))
 best <- which.max(unlist(lapply(results, function(i) i[[1]][1])))
 results[[best]]
 
 
-vignette("summary", package = "rrrsa")
+# vignette("summary", package = "rrrsa")
 
 ########## practice data
 # matrix
@@ -67,9 +80,9 @@ priors <- c(0.1, 0.1, 0.4, 0.3, 0.2)
 rrrsa::rsa.reason(runData, priors = priors)
 rrrsa::rsa.reason(runData)
 
-
-# df :: tidied
-# -------------
+################
+################ df :: tidied
+################
 df <- data.frame(scales = rep("some_all", 10),
                 stars = as.factor(rep(1:5, 2)),
                 degrees = c(rep("strong", 5), rep("weak", 5)),
@@ -107,7 +120,6 @@ df4 <- data.frame(scales = c(rep("some_all", 10), rep("good_excellent", 10)),
                                  0, 0.1, 0.25, 0.5, 0.15,
                                  0, 0, 0, 0.15, 0.85,
                                  0, 0.1, 0.25, 0.5, 0.15))
-
 ## add costs and priors
 df3 <- df3 %>%
   mutate(cost = 0,
@@ -117,81 +129,7 @@ df4 <- df4 %>%
          priors = 0.20)
 
 
-################# using ddply #################
-################# KEEP THIS #################
-group <- "scales"
-d <- plyr::ddply(df4, c(group), rsa.runDf, quantityVarName = "stars",
-      semanticsVarName = "speaker.p", itemVarName = "words", costsVarName = "cost", depth = 2)
-################# KEEP THIS #################
-################# KEEP THIS #################
-group <- "scale"
-dataWithPreds <- plyr::ddply(subset(peloquinFrankData, exp == "e12"), c("scale"), rsa.runDf, quantityVarName = "stars",
-            semanticsVarName = "speaker.p", itemVarName = "words", alpha = 2.3, depth = 1)
-checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
-                "palatable", "delicious")
-filteredWords <- dataWithPreds %>%
-  filter(words %in% checkWords)
 
-cor(filteredWords$e6, filteredWords$preds)
-
-
-
-for (scale in unique(df4$scales)) {
-  print(rsa.runDf(subset(df4, scales == scale), quantityVarName = "stars", semanticsVarName = "speaker.p",
-            itemVarName = "words"))
-}
-
-
-items <- "words"
-quantity <- "stars"
-semantics <- "speaker.p"
-costs <- "cost"
-priors <- "priors"
-
-debug(rsa.runDf)
-test1 <- rsa.runDf(df3, quantityVarName = "starsChar", semanticsVarName = "speaker.p",
-                  itemVarName = "words", costsVarName = "cost", priorsVarName = "priors")
-
-
-n# select costs
-cs <- df3 %>%
-  select_(items, costs) %>%
-  unique()
-costsVec <- cs[ , costs]
-names(costsVec) <- cs[ , items]
-
-
-test2 <- data.frame(test1) %>%
-  mutate(quantity = rownames(.)) %>%
-  gather(item, "preds", -quantity) %>%
-  rename(item = item)
-rename(test2, quantity = eval(quantity))
-names(test2)[which(names(test2) == "quantity")] <- quantity
-
-
-debug(rsa.renameCol)
-rsa.renameCol(test2, c("quantity", "item"), c(quantity, item))
-
-
-d <- practiceData
-d_some <- d %>% filter(scale == "some_all")
-
-rsa.runDf(d_some, quantityVarName = "stars", semanticsVarName = "speaker.p",
-          itemVarName = "degree", depth = 10, alpha = 4)
-debug(rsa.runDf)
-
-d <- plyr::ddply(d, c("scale"), rsa.runDf, quantityVarName = "stars",
-                 semanticsVarName = "speaker.p", itemVarName = "degree", depth = 1, alpha = 1)
-
-with(d, cor(speaker.p, preds))
-names(practiceData)
-
-
-
-
-
-
-## KEEP EVERYTHING BELOW
 
 
 
@@ -231,6 +169,7 @@ literalD$words <- mapply(lookupScalar, literalD$degree, literalD$scale, literalD
 drop <- c("cnt.judgment", "degree")
 literalD <- literalD[, !(names(literalD) %in% drop)]
 
+
 ##########################
 ## pragmatic listener data
 l1 <- read.csv("/Users/benpeloquin/Desktop/Projects/scalar_implicature/models/model_data/RawPragmaticListenerCombined.csv")
@@ -267,28 +206,39 @@ for (e in unique(peloquinFrankData$exp)) {
 peloquinFrank_2Alts <- as.data.frame(subset(peloquinFrankData, exp == "e8"))
 peloquinFrank_4Alts <- subset(peloquinFrankData, exp == "e10")
 peloquinFrank_5Alts <- subset(peloquinFrankData, exp == "e12")
+## adding in the generic none data
+genericNoneDf <- data.frame(exp = rep("e8", 25),
+           scale = c(rep("good_excellent", 5), rep("liked_loved", 5),
+                     rep("memorable_unforgettable", 5), rep("palatable_delicious", 5),
+                     rep("some_all", 5)),
+           stars = rep((1:5), 5),
+           speaker.p = rep(c(1, rep(0, 4)), 5),
+           words = rep("none", 25),
+           e11 = rep(0, 25),
+           e6 = rep(0, 25))
+peloquinFrank_3Alts <- rbind(peloquinFrank_2Alts, genericNoneDf)
 # devtools::use_data(peloquinFrank_2Alts, pkg = ".")
 # devtools::use_data(peloquinFrank_4Alts, pkg = ".")
 # devtools::use_data(peloquinFrank_5Alts, pkg = ".")
+# devtools::use_data(peloquinFrank_3Alts, pkg = ".")
 
 
 compareItems <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
                   "palatable", "delicious")
-debug(rsa.tuneDepthAlpha)
 cors <- rsa.tuneDepthAlpha(peloquinFrank_5Alts,
                    quantityVarName = "stars",
                    semanticsVarName = "speaker.p", groupName = "scale",
-                   itemVarName = "words", alphas = seq(2, 3, by=0.1), compareItems = compareItems,
+                   itemVarName = "words", alphas = seq(5, 10, by=0.1), compareItems = compareItems,
                    compareDataName = "e11")
 which.max(unlist(lapply(cors, function(i) i[[1]][1])))
 
-rsa.tuneDepthAlpha(data = peloquinFrank_5Alts,
+rsa.tuneDepthAlpha(data = speakerGenericNone,
                    quantityVarName = "stars",
                    itemVarName =  "words",
                    semanticsVarName = "speaker.p",
                    compareDataName = "e11",
                    compareItems = compareItems,
-                   alphas = 2,
+                   alphas = seq(5,10, by=0.1),
                    groupName = "scale")
 
 

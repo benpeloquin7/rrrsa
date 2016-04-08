@@ -6,7 +6,7 @@
 \usage{
 rsa.tuneDepthAlpha(data, quantityVarName, semanticsVarName, itemVarName,
   groupName = NA, compareDataName, costsVarName = NA, priorsVarName = NA,
-  depths = 1, alphas = 1, compareItems = NA)
+  depths = 1, alphas = 1, compareIndices = NA)
 }
 \arguments{
 \item{data, }{tidied data}
@@ -29,7 +29,7 @@ rsa.tuneDepthAlpha(data, quantityVarName, semanticsVarName, itemVarName,
 
 \item{alphas, }{vector of alphas for tuning}
 
-\item{compareItems, }{specific items (in itemVarName col) for data subsetting}
+\item{compareIndices, }{specific indices in data frame}
 }
 \value{
 list of length(alphas) * length(depths) tuples with (correlation, depth, alpha)
@@ -45,10 +45,11 @@ alphas <- seq(1, 3, by = 0.1)
 depths <- 1:3
 checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
 "palatable", "delicious")
+compareIndices <- which(peloquinFrank_5Alts$words \%in\% checkWords)
 results <- rsa.tuneDepthAlpha(data = d, groupName = "scale",
 quantityVarName = "stars", itemVarName = "words",
 semanticsVarName = "speaker.p", compareDataName = "e11",
-compareItems = checkWords, alphas = alphas, depths = depths)
+compareIndices = compareIndices, alphas = alphas, depths = depths)
 head(results)
 best <- which.max(unlist(lapply(results, function(i) i[[1]][1])))
 results[[best]]
