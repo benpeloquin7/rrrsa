@@ -66,7 +66,8 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
     dplyr::select_(quantityVarName, semanticsVarName,
                    itemVarName) %>%
     tidyr::spread_(itemVarName, semanticsVarName)
-  rownames(matrixData) <- matrixData[, quantityVarName] #! save names to rows
+  # rownames(matrixData) <- matrixData[, quantityVarName] #! save names to rows
+  rownames(matrixData) <- matrixData[[quantityVarName]]
   matrixData <- matrixData %>%
     dplyr::select(-1) %>%
     data.matrix()
@@ -75,16 +76,16 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
   ## ----------
   ## 1) assume uniform costs (0) if not present in data set
   if (is.na(costsVarName)) {
-    costs <- rep(0, length(unique(data[, itemVarName])))
-    names(costs) <- unique(data[, itemVarName])
+    costs <- rep(0, length(unique(data[[itemVarName]])))
+    names(costs) <- unique(data[[itemVarName]])
   }
   ## 2) else create new (named) vector
   else {
     costsData <- data %>%
       dplyr::select_(itemVarName, costsVarName) %>%
       unique()
-    costs <- costsData[, costsVarName]
-    names(costs) <- costsData[, itemVarName]
+    costs <- costsData[[costsVarName]]
+    names(costs) <- costsData[[itemVarName]]
   }
   #! costs validation check here
 
@@ -92,17 +93,17 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
   ## ------------
   ## 1) assume uniform (1) priors if not present in data set
   if (is.na(priorsVarName)) {
-    priors <- rep(1, length(unique(data[, quantityVarName])))
-    names(priors) <- unique(data[, quantityVarName])
+    priors <- rep(1, length(unique(data[[quantityVarName]])))
+    names(priors) <- unique(data[[quantityVarName]])
   }
   ## 2) else create new (named) priors vector
   else {
     priorsData <- data %>%
       dplyr::select_(quantityVarName, priorsVarName) %>%
       unique()
-    priors <- priorsData[, priorsVarName]
-    names(priors) <- priorsData[, quantityVarName]
-    quantityVec <- priorsData[, quantityVarName] #! store this to repopulate during tyding
+    priors <- priorsData[[priorsVarName]]
+    names(priors) <- priorsData[[quantityVarName]]
+    quantityVec <- priorsData[[quantityVarName]] #! store this to repopulate during tyding
   }
   #! priors validation check here
 
