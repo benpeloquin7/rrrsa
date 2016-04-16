@@ -13,6 +13,7 @@
 #' @param depths, vector of depths (in integers) for tuning
 #' @param alphas, vector of alphas for tuning
 #' @param compareIndices, specific indices in data frame
+#' @param usePriorEveryRecurse, boolean incorporate priors during each full recursion
 #' @return list of length(alphas) * length(depths) tuples with (correlation, depth, alpha)
 #' @keywords data tuning
 #' @export
@@ -29,12 +30,13 @@
 #' compareIndices = compareIndices, alphas = alphas, depths = depths)
 #'
 rsa.bestFit <- function(data, quantityVarName, semanticsVarName, itemVarName, groupName = NA, compareDataName,
-                    costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareIndices = NA) {
+                    costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareIndices = NA,
+                    usePriorEveryRecurse = TRUE) {
   tuning <- rsa.tuneDepthAlpha(data, quantityVarName = quantityVarName,
                                semanticsVarName = semanticsVarName, itemVarName = itemVarName,
                                groupName = groupName, compareDataName = compareDataName, compareIndices = compareIndices,
                                priorsVarName = priorsVarName, costsVarName = costsVarName,
-                               alphas = alphas, depths = depths)
+                               alphas = alphas, depths = depths, usePriorEveryRecurse = usePriorEveryRecurse)
   loc <- which.max(sapply(tuning, FUN = function(i) i[[1]]))
   return(tuning[loc])
 }
@@ -55,6 +57,7 @@ rsa.bestFit <- function(data, quantityVarName, semanticsVarName, itemVarName, gr
 #' @param depths, vector of depths (in integers) for tuning
 #' @param alphas, vector of alphas for tuning
 #' @param compareIndices, specific indices in data frame
+#' @param usePriorEveryRecurse, boolean incorporate priors during each full recursion
 #' @return list of length(alphas) * length(depths) tuples with (correlation, depth, alpha)
 #' @keywords data tuning
 #' @export
@@ -74,7 +77,8 @@ rsa.bestFit <- function(data, quantityVarName, semanticsVarName, itemVarName, gr
 #' results[[best]]
 #'
 rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarName, groupName = NA, compareDataName,
-                               costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareIndices = NA) {
+                               costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareIndices = NA,
+                               usePriorEveryRecurse = TRUE) {
 
   cors <- data.frame(cor = NA, depth = NA, alpha = NA)
   ## running multiple groups
@@ -87,7 +91,7 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
                                  itemVarName = itemVarName,
                                  costsVarName = costsVarName,
                                  priorsVarName = priorsVarName,
-                                 depth = d, alpha = a)
+                                 depth = d, alpha = a, usePriorEveryRecurse = usePriorEveryRecurse)
           if (length(compareIndices) == 1 & is.na(compareIndices[1])) {
             res <- c(cor = cor(currRun[, compareDataName],
                                currRun[, "preds"], use = "pairwise.complete.obs"),
@@ -116,6 +120,7 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
 #' @param priors, nrow(m) vector of priors (default is uniform)
 #' @param depth, number of recursions
 #' @param alpha, decision hyper-parameter
+#' @param usePriorEveryRecurse, boolean incorporate priors during each full recursion
 #' @return matrix of posterior values
 #' @keywords recursion
 #' @export
@@ -126,7 +131,11 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
 #' rsa.reason(m, depth = 0)
 #' rsa.reason(m, depth = 2)
 #'
-rsa.reason <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), depth = 1, alpha = 1) {
+rsa.reason <- function(m,
+                       costs = rep(0, ncol(m)),
+                       priors = rep(1, nrow(m)),
+                       depth = 1, alpha = 1,
+                       usePriorEveryRecurse = TRUE) {
   ## Validation checks
   ## ------------------
   ## passed a matrix
@@ -143,6 +152,7 @@ rsa.reason <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), dep
   }
 
   while(depth > 0) {
+    if (!usePriorEveryRecurse & depth != 1) priors = rep(1, nrow(m)) ##BP addding this 4/15/16
     m <- rsa.fullRecursion(m, costs, priors, alpha)
     depth <- depth - 1
   }

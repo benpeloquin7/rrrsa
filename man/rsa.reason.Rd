@@ -5,7 +5,7 @@
 \title{Run (multiple) iterations RSA}
 \usage{
 rsa.reason(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)),
-  depth = 1, alpha = 1)
+  depth = 1, alpha = 1, usePriorEveryRecurse = TRUE)
 }
 \arguments{
 \item{m, }{matrix of semantics with 'items' cols and 'quantity' rows}
@@ -17,6 +17,8 @@ rsa.reason(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)),
 \item{depth, }{number of recursions}
 
 \item{alpha, }{decision hyper-parameter}
+
+\item{usePriorEveryRecurse, }{boolean incorporate priors during each full recursion}
 }
 \value{
 matrix of posterior values

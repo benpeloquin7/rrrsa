@@ -5,7 +5,8 @@
 \title{Run RSA on a tidied data frame (assumes one group)}
 \usage{
 rsa.runDf(data, quantityVarName, semanticsVarName, itemVarName,
-  costsVarName = NA, priorsVarName = NA, depth = 1, alpha = 1)
+  costsVarName = NA, priorsVarName = NA, depth = 1, alpha = 1,
+  usePriorEveryRecurse = TRUE)
 }
 \arguments{
 \item{data, }{tidied data}
@@ -25,6 +26,8 @@ rsa.runDf(data, quantityVarName, semanticsVarName, itemVarName,
 \item{depth, }{recursive depth parameter}
 
 \item{alpha, }{decision noise parameter level}
+
+\item{usePriorEveryRecurse, }{boolean incorporate priors during each full recursion}
 }
 \value{
 data frame with posterior predictions 'preds' column appended

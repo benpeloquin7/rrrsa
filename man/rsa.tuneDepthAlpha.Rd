@@ -6,7 +6,8 @@
 \usage{
 rsa.tuneDepthAlpha(data, quantityVarName, semanticsVarName, itemVarName,
   groupName = NA, compareDataName, costsVarName = NA, priorsVarName = NA,
-  depths = 1, alphas = 1, compareIndices = NA)
+  depths = 1, alphas = 1, compareIndices = NA,
+  usePriorEveryRecurse = TRUE)
 }
 \arguments{
 \item{data, }{tidied data}
@@ -30,6 +31,8 @@ rsa.tuneDepthAlpha(data, quantityVarName, semanticsVarName, itemVarName,
 \item{alphas, }{vector of alphas for tuning}
 
 \item{compareIndices, }{specific indices in data frame}
+
+\item{usePriorEveryRecurse, }{boolean incorporate priors during each full recursion}
 }
 \value{
 list of length(alphas) * length(depths) tuples with (correlation, depth, alpha)

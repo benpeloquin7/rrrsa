@@ -24,6 +24,7 @@
 #' @param priorsVarName, priors variable name
 #' @param alpha, decision noise parameter level
 #' @param depth, recursive depth parameter
+#' @param usePriorEveryRecurse, boolean incorporate priors during each full recursion
 #' @return data frame with posterior predictions 'preds' column appended
 #' @keywords primary run functionality
 #' @importFrom magrittr "%>%"
@@ -32,7 +33,8 @@
 #' rsa.runDf(peloquinFrank_2Alts, "stars", "speaker.p", "words")
 #'
 rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
-                      costsVarName = NA, priorsVarName = NA, depth = 1, alpha = 1) {
+                      costsVarName = NA, priorsVarName = NA, depth = 1, alpha = 1,
+                      usePriorEveryRecurse = TRUE) {
 
   ## `Not in` helper
   `%!in%` <- function(check, src) {
@@ -108,7 +110,8 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
   #! priors validation check here
 
   ## run rsa, compute posteriors
-  posteriors <- rsa.reason(matrixData, depth = depth, alpha = alpha, costs = costs, priors = priors)
+  posteriors <- rsa.reason(matrixData, depth = depth, alpha = alpha, costs = costs, priors = priors,
+                           usePriorEveryRecurse = usePriorEveryRecurse)
 
   ## tidy data
   tidyPosterior<- data.frame(posteriors) %>%
