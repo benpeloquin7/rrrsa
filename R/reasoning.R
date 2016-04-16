@@ -150,11 +150,14 @@ rsa.reason <- function(m,
   if (length(alpha) > 1 | !is.numeric(alpha) | any(alpha < 1)) {
     stop("Invalid alpha amount, must be numerical expression strictly greather than 0")
   }
-
-  while(depth > 0) {
-    if (!usePriorEveryRecurse & depth != 1) priors = rep(1, nrow(m)) ##BP addding this 4/15/16
-    m <- rsa.fullRecursion(m, costs, priors, alpha)
-    depth <- depth - 1
+  depth_itr <- depth
+  while(depth_itr > 0) {
+    if (!usePriorEveryRecurse & depth_itr != 1) {
+      m <- rsa.fullRecursion(m, costs, rep(1, nrow(m)), alpha)
+    } else {
+      m <- rsa.fullRecursion(m, costs, priors, alpha)
+    }
+    depth_itr <- depth_itr - 1
   }
   m
 }
