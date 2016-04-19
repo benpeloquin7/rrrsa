@@ -146,8 +146,8 @@ rsa.reason <- function(m,
   if (length(priors) != nrow(m)) stop("Incorrect priors vector dimensions")
   ## depth >= 0
   if ((depth < 0) | (depth %% 1 != 0)) stop("Invalid depth amount, must be an integer ge 0")
-  ## alpha > 0
-  if (length(alpha) > 1 | !is.numeric(alpha) | any(alpha < 1)) {
+  ## alpha >= 0
+  if (length(alpha) > 1 | !is.numeric(alpha) | any(alpha < 0)) {
     stop("Invalid alpha amount, must be numerical expression strictly greather than 0")
   }
   depth_itr <- depth
@@ -189,8 +189,8 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
   if (length(priors) != nrow(m)) stop("Incorrect priors vector dimensions")
   ## Populate some col names if none given
   if (is.null(colnames(m))) colnames(m) <- 1:ncol(m)
-  ## alphas > 0
-  if (length(alpha) > 1 | !is.numeric(alpha) | any(alpha < 1)) {
+  ## alphas >= 0
+  if (length(alpha) > 1 | !is.numeric(alpha) | any(alpha < 0)) {
     stop("Invalid alpha amount, must be numerical expression strictly greather than 0")
   }
 
@@ -240,7 +240,7 @@ rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
   ## Validation checks
   ## -----------------
   if (length(items) != length(costs)) stop("Item and cost dimensions do not match")
-  if (length(alpha) > 1 | !is.numeric(alpha) | any(alpha < 1)) stop("Invalid alpha amount, must be numerical expression strictly greather than 0")
+  if (length(alpha) > 1 | !is.numeric(alpha) | any(alpha < 0)) stop("Invalid alpha amount, must be numerical expression strictly greather than 0")
 
   rsa.normVec(mapply(rsa.informativity, items, costs, alpha = alpha))
 }
@@ -264,7 +264,7 @@ rsa.informativity <- function(m_u, alpha = 1, cost = 0) {
   ## Validation checks
   ## -----------------
   if (m_u < 0 | m_u > 1) stop("Invalid semantic 'm_u' value, must be between [0, 1]")
-  if (alpha < 1) stop("Invalid alpha, must be a positive, non-zero numerical expression")
+  if (alpha < 0) stop("Invalid alpha, must be a positive, non-zero numerical expression")
 
   ## Watch for m_u == 0 in which case return 0
   ifelse(m_u == 0, 0, exp(-alpha * (-log(m_u) - cost)))
