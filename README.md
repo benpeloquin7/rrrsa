@@ -38,7 +38,7 @@ Run RSA on a tidied data frame and avoid running individual model components ind
 
 If a user has `pragmatic judgment` data we can use the `tuneDepthAlpha` function to tune hyperparameters. Calling this function requires the same argument list as a simple `runDf` with the addition of `alphas` and `depths` vectors to iterate over as well as the column of `pragmatic judgments` specified through the `compareDataVarName` argument, which we'll be using as the basis of comparison.
 
-## Data from Peloquin & Frank (under review)
+## Data from Peloquin & Frank (2016)
 
 `rrrsa` includes empirical literal listener $P_{L_0}$ which can be used as input to `rrrsa` as well as $P_{L_1}$ pragmatic judgments for model tuning and comparison. Four data sets are included:
 
