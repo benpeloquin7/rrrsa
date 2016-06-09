@@ -18,7 +18,7 @@ Rational speech act (RSA) models frame language understanding as a special case 
 
 $$P_{L_n}(m|u) \propto P_{S_n}(u|m)P(m)$$
 $$P_{S_n} \propto e^{U(m;u)}$$
-$$U(m;u) = -\alpha(\log(P_{L_{n-1}}(m|u)) - C(u))$$
+$$U(m;u) = -\alpha(-\log(P_{L_{n-1}}(m|u)) - C(u))$$
 
 ## rrrsa includes access to all model components
 `rrrsa` provides users with access to all model components. The following sections demonstrate how this functionality can be used.
@@ -47,7 +47,7 @@ rsa.utility(items = literalSemantics, costs = costs, alpha = 3)
 ```
 
 ### Computing one full recursion
-In the RSA framework one full recursion consists of a `pragmatic listner` $P_{L_1}$ who reasons about a `rational speaker` $P_{s_1}$ who reason about a `literal listener` $P_{L_0}$. Expected input is an $m$ matrix of  $P_{L_0}$ `literal listener` values in which columns corresond to items (words) and rows correspond to semantic quantity (stars in Peloquin & Frank, under review). Optional arguments include a `costs` vector which whould be the same length as `ncol` and an optional `priors` vector which should the same length as `nrows`. `rsa.fullRecursion` provides safety checking for these cases. Output corresponds with pragmatic listener posterior predictions.
+In the RSA framework one full recursion consists of a `pragmatic listner` $P_{L_1}$ who reasons about a `rational speaker` $P_{s_1}$ who reason about a `literal listener` $P_{L_0}$. Expected input is an $m$ matrix of  $P_{L_0}$ `literal listener` values in which columns corresond to items (words) and rows correspond to semantic quantity (stars in Peloquin & Frank, 2016). Optional arguments include a `costs` vector which whould be the same length as `ncol` and an optional `priors` vector which should the same length as `nrows`. `rsa.fullRecursion` provides safety checking for these cases. Output corresponds with pragmatic listener posterior predictions.
 ```{r fig.height=5, fig.width=6}
 m <- matrix(data = c(1.0, 0.0, 0.0, 0.0, 0.0,
                      0.0, 0.25, 0.25, 0.25, 0.25,
@@ -120,7 +120,7 @@ df$costs <- c(rep(3, 5), rep(4, 5), rep(9, 5), rep(4, 5))
 tail(plyr::ddply(.data = df, .variables = c("scales"), rsa.runDf, quantityVarName = "stars",
       semanticsVarName = "listenerSemantics", itemVarName = "words", costsVarName = "costs", depth = 2), n = 3)
 ```
-We can see this more clearly using data from Peloquin & Frank (under review). Here the grouping variable represents five different scalar familes (5 in total) named `scale`.
+We can see this more clearly using data from Peloquin & Frank (2016). Here the grouping variable represents five different scalar familes (5 in total) named `scale`.
 ```{r}
 d <- peloquinFrank_2Alts
 head(plyr::ddply(.data = d, .variables = c("scale"), rsa.runDf, quantityVarName = "stars",
@@ -166,7 +166,7 @@ ggplot(bestModel, aes(x = stars, y = e11, col=words)) +
   geom_line(aes(y = preds), size=1, lty=4)
 ```
 
-## Data from Peloquin & Frank (under review)
+## Data from Peloquin & Frank (2016)
 `rrrsa` includes empirical literal listener $P_{L_0}$ which can be used as input to `rrrsa` as well as $P_{L_1}$ pragmatic judgments for model tuning and comparison. Four data sets are included:
 
 `peloquinFrank_2Alts`: data set with entailment alternatives
