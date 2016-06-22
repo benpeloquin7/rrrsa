@@ -32,8 +32,14 @@
 #' @examples
 #' rsa.runDf(peloquinFrank_2Alts, "stars", "speaker.p", "words")
 #'
-rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
-                      costsVarName = NA, priorsVarName = NA, depth = 1, alpha = 1,
+rsa.runDf <- function(data,
+                      quantityVarName,
+                      semanticsVarName,
+                      itemVarName,
+                      costsVarName = NA,
+                      priorsVarName = NA,
+                      depth = 1,
+                      alpha = 1,
                       usePriorEveryRecurse = TRUE) {
 
   ## `Not in` helper
@@ -44,6 +50,7 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
   ## validation checks
   ## -----------------
   ## basic check for three neccessary specifications
+  ##
   if (any(c(quantityVarName, semanticsVarName, itemVarName) %!in% names(data))) {
     stop("Cannot find column specification for quantity OR semantics OR items")
   }
@@ -53,6 +60,7 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
 
   ## initial data processing
   ## -----------------------
+  ##
   originalData <- data                #! save original data
   matrixLabels <- c(quantityVarName,  #! three required fields
                     semanticsVarName,
@@ -60,15 +68,15 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
 
   ## semantics data
   ## --------------
+  ## Convert df to matrix
   ## Matrix info ->
   ##   cols = items (words),
   ##   rows = quantities (stars),
   ##   values = semantics (L0 probs)
+  ##
   matrixData <- data %>%
-    dplyr::select_(quantityVarName, semanticsVarName,
-                   itemVarName) %>%
+    dplyr::select_(quantityVarName, semanticsVarName, itemVarName) %>%
     tidyr::spread_(itemVarName, semanticsVarName)
-  # rownames(matrixData) <- matrixData[, quantityVarName] #! save names to rows
   rownames(matrixData) <- matrixData[[quantityVarName]]
   matrixData <- matrixData %>%
     dplyr::select(-1) %>%
@@ -76,6 +84,7 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
 
   ## costs data
   ## ----------
+  ##
   ## 1) assume uniform costs (0) if not present in data set
   if (is.na(costsVarName)) {
     costs <- rep(0, length(unique(data[[itemVarName]])))
@@ -93,6 +102,7 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
 
   ## priors data
   ## ------------
+  ##
   ## 1) assume uniform (1) priors if not present in data set
   if (is.na(priorsVarName)) {
     priors <- rep(1, length(unique(data[[quantityVarName]])))
@@ -110,14 +120,17 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
   #! priors validation check here
 
   ## run rsa, compute posteriors
-  posteriors <- rsa.reason(matrixData, depth = depth, alpha = alpha, costs = costs, priors = priors,
+  posteriors <- rsa.reason(matrixData,
+                           depth = depth,
+                           alpha = alpha,
+                           costs = costs,
+                           priors = priors,
                            usePriorEveryRecurse = usePriorEveryRecurse)
 
   ## tidy data
-  tidyPosterior<- data.frame(posteriors) %>%
+  tidyPosterior <- data.frame(posteriors) %>%
     dplyr::mutate(quantityVarName = rownames(posteriors)) %>% #! add back quantity (stored in rownames)
     tidyr::gather(itemVarName, "preds", -quantityVarName)
-
 
   ## ensure col type matching before merge
   tidyPosterior[,"quantityVarName"] <- rsa.convertVecType(originalData[, quantityVarName],
@@ -129,7 +142,6 @@ rsa.runDf <- function(data, quantityVarName, semanticsVarName, itemVarName,
   renamedDf <- tidyPosterior %>%
     rsa.renameCol(c("quantityVarName", "itemVarName"),
                   c(quantityVarName, itemVarName))
-
 
 
   ## join with original data set

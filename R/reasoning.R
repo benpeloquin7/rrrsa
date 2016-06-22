@@ -135,7 +135,7 @@ rsa.reason <- function(m,
                        costs = rep(0, ncol(m)),
                        priors = rep(1, nrow(m)),
                        depth = 1, alpha = 1,
-                       usePriorEveryRecurse = TRUE) {
+                       usePriorEveryRecurse = FALSE) {
   ## Validation checks
   ## ------------------
   ## passed a matrix
@@ -150,11 +150,17 @@ rsa.reason <- function(m,
   if (length(alpha) > 1 | !is.numeric(alpha) | any(alpha < 0)) {
     stop("Invalid alpha amount, must be numerical expression strictly greather than 0")
   }
+
+  ## run recursions for 'depth' iterations
   depth_itr <- depth
   while(depth_itr > 0) {
+    ## use unif priors
+    ## if we don't include during every recursion and we're not at depth 1
     if (!usePriorEveryRecurse & depth_itr != 1) {
       m <- rsa.fullRecursion(m, costs, rep(1, nrow(m)), alpha)
-    } else {
+    }
+    ## use argument priors
+    else {
       m <- rsa.fullRecursion(m, costs, priors, alpha)
     }
     depth_itr <- depth_itr - 1
@@ -202,7 +208,7 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
   costsAsMatrix <- matrix(rep(costs, times = 1, each = nrow(m)), nrow = nrow(m))
   if (is.null(names(costs))) colnames(costsAsMatrix) <- cNames  #! name cols
   else colnames(costsAsMatrix) <- names(costs)
-  costsAsMatrix <- costsAsMatrix[ , cNames]                     #! IMPORTANT: maintain col ordering with 'm'
+  costsAsMatrix <- costsAsMatrix[, cNames]                     #! IMPORTANT: maintain col ordering with 'm'
   rownames(costsAsMatrix) <- rNames                             #! assign rownames, don't lose this data
 
   ## likelihood (compute over rows) ------ :: p(u | m)
@@ -212,7 +218,7 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
   ## priors ------------------------------ :: p(u | m) * p(m)
   likelihood <- apply(likelihood, 2, function(i) priors * i)
 
-  ## normalization (compute over cols) --- :: [p(u | m) * p(m)] / (\sum_m p(m | u) * p(m))
+  ## normalization (compute over cols) --- :: [p(u | m) * p(m)] / (\sum_m p(u | m) * p(m))
   posterior <- apply(likelihood, 2, rsa.normVec)
 
   ## re-label matrix
@@ -239,6 +245,7 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
 rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
   ## Validation checks
   ## -----------------
+  ##
   if (length(items) != length(costs)) stop("Item and cost dimensions do not match")
   if (length(alpha) > 1 | !is.numeric(alpha) | any(alpha < 0)) stop("Invalid alpha amount, must be numerical expression strictly greather than 0")
 
@@ -263,6 +270,7 @@ rsa.utility <- function(items, costs = rep(0, length(items)), alpha = 1) {
 rsa.informativity <- function(m_u, alpha = 1, cost = 0) {
   ## Validation checks
   ## -----------------
+  ##
   if (m_u < 0 | m_u > 1) stop("Invalid semantic 'm_u' value, must be between [0, 1]")
   if (alpha < 0) stop("Invalid alpha, must be a positive, non-zero numerical expression")
 
