@@ -112,7 +112,7 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
   cors[order(-cors$cor), ]
 }
 
-#' Run (multiple) iterations RSA
+#' Run multiple iterations (recursions) of RSA
 #'
 #' Return matrix after undergoing number 'depth' recursions
 #' @param m, matrix of semantics with 'items' cols and 'quantity' rows
@@ -120,7 +120,7 @@ rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarN
 #' @param priors, nrow(m) vector of priors (default is uniform)
 #' @param depth, number of recursions
 #' @param alpha, decision hyper-parameter
-#' @param usePriorEveryRecurse, boolean incorporate priors during each full recursion
+#' @param usePriorEveryRecurse, boolean incorporate priors during each full recursion, default is FALSE
 #' @return matrix of posterior values
 #' @keywords recursion
 #' @export
@@ -184,7 +184,10 @@ rsa.reason <- function(m,
 #' rsa.fullRecursion(m)
 #' rsa.fullRecursion(rsa.fullRecursion(m))
 #'
-rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)), alpha = 1) {
+rsa.fullRecursion <- function(m,
+                              costs = rep(0, ncol(m)),
+                              priors = rep(1, nrow(m)),
+                              alpha = 1) {
   ## Validation checks
   ## -----------------
   ## passed a matrix
@@ -208,7 +211,7 @@ rsa.fullRecursion <- function(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m
   costsAsMatrix <- matrix(rep(costs, times = 1, each = nrow(m)), nrow = nrow(m))
   if (is.null(names(costs))) colnames(costsAsMatrix) <- cNames  #! name cols
   else colnames(costsAsMatrix) <- names(costs)
-  costsAsMatrix <- costsAsMatrix[, cNames]                     #! IMPORTANT: maintain col ordering with 'm'
+  costsAsMatrix <- costsAsMatrix[, cNames]                      #! IMPORTANT: maintain col ordering with 'm'
   rownames(costsAsMatrix) <- rNames                             #! assign rownames, don't lose this data
 
   ## likelihood (compute over rows) ------ :: p(u | m)
