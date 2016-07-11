@@ -1,4 +1,53 @@
-#' Run RSA on a tidied data frame (assumes one group)
+#' Run RSA on tidied data frame with multiple groups
+#' rsa-ready, tidied data should have a unique semantic value for each quantity * item combination.
+#' (see formatting of peloquinFrank_2Alts data).
+#' @param data, tidied data
+#' @param groupVarName, grouping variable for subsetting DF
+#' @param quantityVarName, entity name we're quantifying over
+#' (i.e. "stars" in Peloquin & Frank (2016))
+#' @param semanticsVarName, literal listener semantic values for RSA computations
+#' @param itemVarName, unique items were comparing, probaby words
+#' (i.e. "degrees" in Peloquin & Frank (2016))
+#' @param costsVarName, costs variable name
+#' @param priorsVarName, priors variable name
+#' @param alpha, decision noise parameter level
+#' @param depth, recursive depth parameter
+#' @param usePriorEveryRecurse, boolean incorporate priors during each full recursion
+#' @return data frame with posterior predictions 'preds' column appended
+#' @keywords wrapper for primary run functionality (rsa.runDf_subset)
+#' @importFrom magrittr "%>%"
+#' @export
+#' @examples
+#' rsa.runDf_grouped(peloquinFrank_2Alts,
+#'           groupVarNBame="scale",
+#'           quantityVarName="stars",
+#'           semanticsVarName="speaker.p",
+#'           itemVarName="words")
+#'
+rsa.runDf_grouped <- function(data,
+                      groupVarName,
+                      quantityVarName,
+                      semanticsVarName,
+                      itemVarName,
+                      costsVarName = NA,
+                      priorsVarName = NA,
+                      depth = 1,
+                      alpha = 1,
+                      usePriorEveryRecurse = FALSE) {
+
+  ## Note: validation checks made in `rsa.runDf_subset()`
+  data %>%
+    arrange(groupVarName) %>%
+    plyr::ddply(.data = .,
+                .variables = c(groupVarName),
+                .fun = rsa.runDf_subset,
+                quantityVarName = quantityVarName,
+                semanticsVarName = semanticsVarName,
+                itemVarName = itemVarName,
+                alpha = alpha)
+}
+
+#' Run RSA on a tidied data frame subset (by group or on DF with one grouping var)
 #'
 #' Expects tidied data with three required (1-3) and two optional fields (4, 5)
 #'
@@ -40,7 +89,7 @@ rsa.runDf <- function(data,
                       priorsVarName = NA,
                       depth = 1,
                       alpha = 1,
-                      usePriorEveryRecurse = TRUE) {
+                      usePriorEveryRecurse = FALSE) {
 
   ## `Not in` helper
   `%!in%` <- function(check, src) {
