@@ -2,10 +2,10 @@
 % Please edit documentation in R/reasoning.R
 \name{rsa.reason}
 \alias{rsa.reason}
-\title{Run (multiple) iterations RSA}
+\title{Run multiple iterations (recursions) of RSA}
 \usage{
 rsa.reason(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)),
-  depth = 1, alpha = 1, usePriorEveryRecurse = TRUE)
+  depth = 1, alpha = 1, usePriorEveryRecurse = FALSE)
 }
 \arguments{
 \item{m, }{matrix of semantics with 'items' cols and 'quantity' rows}
@@ -18,7 +18,7 @@ rsa.reason(m, costs = rep(0, ncol(m)), priors = rep(1, nrow(m)),
 
 \item{alpha, }{decision hyper-parameter}
 
-\item{usePriorEveryRecurse, }{boolean incorporate priors during each full recursion}
+\item{usePriorEveryRecurse, }{boolean incorporate priors during each full recursion, default is FALSE}
 }
 \value{
 matrix of posterior values

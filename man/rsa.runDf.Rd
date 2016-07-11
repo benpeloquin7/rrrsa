@@ -6,7 +6,7 @@
 \usage{
 rsa.runDf(data, quantityVarName, semanticsVarName, itemVarName,
   costsVarName = NA, priorsVarName = NA, depth = 1, alpha = 1,
-  usePriorEveryRecurse = TRUE)
+  usePriorEveryRecurse = FALSE)
 }
 \arguments{
 \item{data, }{tidied data}
