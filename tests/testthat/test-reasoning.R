@@ -81,7 +81,7 @@ test_that("rsa.reason returns valid values", {
   expect_that(rsa.reason(m, costs = costs, depth = 2),
               is_equivalent_to(rsa.reason(rsa.reason(m, costs = costs), costs = costs)))
   expect_that(rsa.reason(m, priors = priors, depth = 2),
-              is_equivalent_to(rsa.reason(rsa.reason(m, priors = priors), priors = priors)))
+              is_equivalent_to(rsa.reason(rsa.reason(m), priors = priors)))
 })
 test_that("rsa.reason passed valid values", {
   m <- matrix(data = c(1.0, 0.0, 0.0, 0.0, 0.0,

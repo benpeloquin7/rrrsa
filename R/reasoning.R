@@ -58,6 +58,8 @@ rsa.bestFit <- function(data, quantityVarName, semanticsVarName, itemVarName, gr
 #' @param alphas, vector of alphas for tuning
 #' @param compareIndices, specific indices in data frame
 #' @param usePriorEveryRecurse, boolean incorporate priors during each full recursion
+#' @importFrom stats "na.omit"
+#' @importFrom stats "cor"
 #' @return list of length(alphas) * length(depths) tuples with (correlation, depth, alpha)
 #' @keywords data tuning
 #' @export

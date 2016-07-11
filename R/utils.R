@@ -18,11 +18,11 @@
 #' @importFrom magrittr "%>%"
 #' @export
 #' @examples
-#' rsa.runDf_grouped(peloquinFrank_2Alts,
-#'           groupVarNBame="scale",
+#' rsa.runDf_grouped(data=peloquinFrank_2Alts,
+#'           groupVarName="scale",
 #'           quantityVarName="stars",
-#'           semanticsVarName="speaker.p",
-#'           itemVarName="words")
+#'           itemVarName="words",
+#'           semanticsVarName="speaker.p")
 #'
 rsa.runDf_grouped <- function(data,
                       groupVarName,
@@ -35,12 +35,10 @@ rsa.runDf_grouped <- function(data,
                       alpha = 1,
                       usePriorEveryRecurse = FALSE) {
 
-  ## Note: validation checks made in `rsa.runDf_subset()`
+  ## Note: validation checks made in `rsa.runDf()`
   data %>%
-    arrange(groupVarName) %>%
-    plyr::ddply(.data = .,
-                .variables = c(groupVarName),
-                .fun = rsa.runDf_subset,
+    plyr::ddply(.variables = c(groupVarName),
+                .fun = rsa.runDf,
                 quantityVarName = quantityVarName,
                 semanticsVarName = semanticsVarName,
                 itemVarName = itemVarName,
