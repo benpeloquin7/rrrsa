@@ -12,8 +12,6 @@ test_that("rsa.informativity passed valid values", {
 
   expect_error(rsa.informativity(m_u = -1.5))    #! no negative vals
   expect_error(rsa.informativity(m_u = 2))       #! values must be between [0, 1]
-  expect_error(rsa.informativity(m_u = 0.5, alpha = 0),
-               "Invalid alpha, must be a positive, non-zero numerical expression")  #! alpha values must be (0, +inf)
   expect_error(rsa.informativity(m_u = 0.5, alpha = -1),
                "Invalid alpha, must be a positive, non-zero numerical expression")  #! alpha values must be (0, +inf)
 })
