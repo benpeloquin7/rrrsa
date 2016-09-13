@@ -28,6 +28,7 @@ library(rrrsa)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
+library(purrr)
 ```
 
 
@@ -165,6 +166,89 @@ ggplot(bestModel, aes(x = stars, y = e11, col=words)) +
   facet_wrap(~scale) +
   geom_line(aes(y = preds), size=1, lty=4)
 ```
+
+## Data from `Rational speeach act models of pragmatic reasoning in reference games`
+
+`rrrsa` includes empirical data used in Frank et al. (Under Review) model simulations. We provide users with access to the data and include a short example of running simulations.
+
+### Description of data
+```{r pragmod_head}
+head(d_pragmods)
+```
+You'll notice some `NA` values. This is because...
+
+The other columns represent:
+--  expts
+-- ...
+-- 
+
+### Example using `rrrsa` and `purrr` 
+
+To run a basic model simulation we'll want to run individual simulations over expts. We've provided a grouping variable in the data frame (`grouper`) which allows us to to do this.
+
+Here we split by the grouping variable `grouper` and use `purrr`'s `map_df` function which allows us to run our `rsa.run_df` over subsets of the data frame. This equivalent to subsetting `d_pragmods` by each factor in `grouper`, running `rsa.rund_df` and rbinding the results.
+```{r pragmods_sim_1}
+d_preds_priors <- d_pragmods %>%
+  split(list(.$grouper)) %>%
+  map_df(~rsa.runDf(
+    data=.x,
+    quantityVarName="object",
+    semanticsVarName="speaker.p",
+    itemVarName="query",
+    priorsVarName = "priorValue",
+    depth=1,
+    alpha=1)) %>%
+  mutate(keep_indices = ifelse(!is.na(count), "keep", "throwout")) %>%
+  filter(keep_indices=="keep")
+```
+Notice that we're not interested in all the data here. We only collected empirical judgments for some of the items, but `rrrsa` requires that we include all the alternatives. We handle this by identifiying all the rows that contain `NA`s after running the simulations and removing them.
+
+How does our model do?
+```{r pragmods_sim_1_plot}
+ggplot(d_preds_priors, aes(x=preds, y=p, col=expt, pch=object)) +
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2) +
+  ggtitle(paste0("Priors model sims\nalpha=1, depth=1\n",
+                 "cor=",
+                 round(cor(d_preds_priors$p, d_preds_priors$preds), 2))) +
+  theme_bw()
+```
+
+We can re-run without including priors by simply omitting the `priors` column name, in this case `priorValue`.
+
+```{r pragmods_sim_2}
+d_preds_no_priors <- d_pragmods %>%
+  split(list(.$grouper)) %>%
+  map_df(~rsa.runDf(
+    data=.x,
+    quantityVarName="object",
+    semanticsVarName="speaker.p",
+    itemVarName="query",
+    # priorsVarName = "priorValue",
+    depth=1,
+    alpha=1)) %>%
+  mutate(keep_indices = ifelse(!is.na(count), "keep", "throwout")) %>%
+  filter(keep_indices=="keep")
+```
+
+```{r pragmods_sim_2_plot}
+ggplot(d_preds_no_priors, aes(x=preds, y=p, col=expt, pch=object)) +
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2) +
+  ggtitle(paste0("No priors model sims\nalpha=1, depth=1\n",
+                 "cor=",
+                 round(cor(d_preds_no_priors$p, d_preds_no_priors$preds), 2))) +
+  theme_bw()
+```
+
 
 ## Data from Peloquin & Frank (2016)
 `rrrsa` includes empirical literal listener $P_{L_0}$ which can be used as input to `rrrsa` as well as $P_{L_1}$ pragmatic judgments for model tuning and comparison. Four data sets are included:
