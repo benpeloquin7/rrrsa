@@ -123,8 +123,9 @@ rsa.runDf <- function(data,
   ##
   matrixData <- data %>%
     dplyr::select_(quantityVarName, semanticsVarName, itemVarName) %>%
-    tidyr::spread_(itemVarName, semanticsVarName)
-  # rownames(matrixData) <- matrixData[[quantityVarName]]
+    tidyr::spread_(itemVarName, semanticsVarName) %>%
+    as.data.frame()
+  rownames(matrixData) <- matrixData[[quantityVarName]]
   matrixData <- matrixData %>%
     dplyr::select(-1) %>%
     data.matrix()
