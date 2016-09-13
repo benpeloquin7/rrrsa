@@ -124,7 +124,7 @@ rsa.runDf <- function(data,
   matrixData <- data %>%
     dplyr::select_(quantityVarName, semanticsVarName, itemVarName) %>%
     tidyr::spread_(itemVarName, semanticsVarName)
-  rownames(matrixData) <- matrixData[[quantityVarName]]
+  # rownames(matrixData) <- matrixData[[quantityVarName]]
   matrixData <- matrixData %>%
     dplyr::select(-1) %>%
     data.matrix()
@@ -175,15 +175,19 @@ rsa.runDf <- function(data,
                            usePriorEveryRecurse = usePriorEveryRecurse)
 
   ## tidy data
-  tidyPosterior <- data.frame(posteriors) %>%
+  tidyPosterior <- as.data.frame(posteriors) %>%
     dplyr::mutate(quantityVarName = rownames(posteriors)) %>% #! add back quantity (stored in rownames)
     tidyr::gather(itemVarName, "preds", -quantityVarName)
 
   ## ensure col type matching before merge
-  tidyPosterior[,"quantityVarName"] <- rsa.convertVecType(originalData[, quantityVarName],
-                                                          tidyPosterior[, "quantityVarName"])
-  tidyPosterior[,"itemVarName"] <- rsa.convertVecType(originalData[, itemVarName],
-                                                          tidyPosterior[, "itemVarName"])
+  tidyPosterior[,"quantityVarName"] <- rsa.convertVecType(originalData[[quantityVarName]],
+                                                          tidyPosterior[["quantityVarName"]])
+  tidyPosterior[,"itemVarName"] <- rsa.convertVecType(originalData[[itemVarName]],
+                                                      tidyPosterior[["itemVarName"]])
+  # tidyPosterior[,"quantityVarName"] <- rsa.convertVecType(originalData[, quantityVarName],
+  #                                                         tidyPosterior[, "quantityVarName"])
+  # tidyPosterior[,"itemVarName"] <- rsa.convertVecType(originalData[, itemVarName],
+  #                                                         tidyPosterior[, "itemVarName"])
 
   ## rename columns lost during dplyr
   renamedDf <- tidyPosterior %>%
