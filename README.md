@@ -1,14 +1,23 @@
 # Really Recursive Rational speech act models (rrrsa) of pragmatic inference
 
-`rrrsa` is an R package for running RSA, a Bayesian model of pragmatic inference. `rrrsa` was created by Ben Peloquin in collaboration with Michael C. Frank.
+`rrrsa` is an R package for running RSA models -- Bayesian models of pragmatic inference. `rrrsa` was created by Ben Peloquin in collaboration with Michael C. Frank and has been optimized for analysis of experimental data such as those presented in Frank, et al. (Under Review) and Peloquin & Frank (2016). For other, more flexible variants of RSA models, please see http://forestdb.org/models/scalar-implicature.html.
+
+## Installation
+You can install the latest version of `rrrsa` by installing `devtools` and running:
+```{r install_demo, eval=FALSE}
+install.packages("devtools")
+devtools::install_github("benpeloquin7/rrrsa")
+```
 
 ## What is RSA?
-
 Rational speech act (RSA) models frame language understanding as a special case of social cognition in which `speakers` and `listeners` reason about one another recursively. A `pragmatic listener` $P_{L_n}(m|u)$, reasons about intended meaning $m$ of an utterance $u$ by a `rational speaker` $P_{s_n}(u|m)$ who chooses an utterance according to the expected utility of an utterance $U(m;u)$. $\alpha$ is a decision noise parameter.
 
 $$P_{L_n}(m|u) \propto P_{S_n}(u|m)P(m)$$
 $$P_{S_n} \propto e^{U(m;u)}$$
-$$U(m;u) = -\alpha(\log(P_{L_{n-1}}(m|u)) - C(u))$$
+$$U(m;u) = -\alpha(-\log(P_{L_{n-1}}(m|u)) - C(u))$$
+
+## rrrsa includes empirical data
+Data from "Rational speech act models of pragmatic reasoning in reference games" (Frank, et al., Under Reivew) and "Determining the alternatives in scalar implicature" (Peloquin & Frank, 2016) are also included in this package. Examples using data from these studies are included below.
 
 ## rrrsa includes access to all model components
 
@@ -33,19 +42,3 @@ In the RSA framework one full recursion consists of a `pragmatic listner` $P_{L_
 ### Running data frames
  
 Run RSA on a tidied data frame and avoid running individual model components individually with `rsa.runDf`. An RSA-ready, tidied data frame must contian columns for semantic `quantity`, `item` and `semantics`, where each row corresponds with unique `item`/`quantity` combination. A user should specify their naming convention for these items in the `quantityVarName`, `itemVarName` and `semanticsVarName` arguments. The `costVarName` and `priorsVarName` args correspond with `costs` and/or `priors` data. Users can specify values for `alpha` and `depth` hyperparamenters. `runDf` will return a data frame with a new model predictions `preds` column appended.
-
-### Tuning hyperparamaters
-
-If a user has `pragmatic judgment` data we can use the `tuneDepthAlpha` function to tune hyperparameters. Calling this function requires the same argument list as a simple `runDf` with the addition of `alphas` and `depths` vectors to iterate over as well as the column of `pragmatic judgments` specified through the `compareDataVarName` argument, which we'll be using as the basis of comparison.
-
-## Data from Peloquin & Frank (2016)
-
-`rrrsa` includes empirical literal listener $P_{L_0}$ which can be used as input to `rrrsa` as well as $P_{L_1}$ pragmatic judgments for model tuning and comparison. Four data sets are included:
-
-`peloquinFrank_2Alts`: data set with entailment alternatives
-
-`peloquinFrank_3Alts`: data set with entailment alternatives + universal none
-
-`peloquinFrank_4Alts`: data set with entailment alternatives + top two empirically derived alts
-
-`peloquinFrank_5Alts`: data set with entailment alternatives + top two empirically derived alts + neutral valence alternative
