@@ -3,25 +3,41 @@
 \docType{data}
 \name{d_pragmods}
 \alias{d_pragmods}
-\title{Data from Rational speech act models of pragmatic reasoning in reference games}
+\title{d_pragmods}
 \description{
-This data set contains ....
+Data from "Rational speech act models of pragmatic reasoning in reference games" Frank, et al. (Under Review)
 }
 \details{
-1) quantityVarName :: "stars"
+`condition` :: specific condition corresponding to `expt`.
 
-2) semanticsVarName :: "speaker.p"
+`expt` :: specific experimental data. See Table 1 in Frank et al. (Under Review).
 
-3) itemVarName :: "words"
+`matrix` :: type of literal semantics matrix. See fig. 9 in Frank et al. (Under Review) for an example.
 
-4) groupVarName :: "scale"
+`prior` :: type of prior for current row.
 
-other) experiment number :: "exp"
+`query` :: target query corresponding to `p` and `speaker.p`
 
-other) Pragmatic judgments study 1 (e6), study 2 (e11)
+`object` :: type of object being queried
+
+`count` :: number of times participants selected a queried object in this experiment
+
+`p` :: proportion of times participants selected a queried object in this experiment. This is the value we try to predict with `rsa`
+
+`n` :: sample size
+
+`cih` and `cil` :: high/low 95% CIs on `p`
+
+`priorType` :: type of prior
+
+`priorValue` :: proportion of times choosing `priortype`
+
+`grouper` :: grouping variable for compatibility with `rsa.runDf()` and `purrr::map_df()`
+
+`speaker.p` :: literal listener semantics
 }
 \references{
-\url{https://github.com/langcog/scalar_implicature}
+\url{https://github.com/langcog/pragmods}
 }
 \keyword{data}
 
