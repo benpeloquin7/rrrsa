@@ -99,19 +99,3 @@ test_that("rsa.reason passed valid values", {
   expect_error(rsa.reason(m, alpha = c(1, 2)), "Invalid alpha amount, must be numerical expression strictly greather than 0")
   expect_error(rsa.reason(m, alpha = "apple"), "Invalid alpha amount, must be numerical expression strictly greather than 0")
 })
-
-## rsa.tuneDepthAlpha()
-## -------------------
-test_that("rsa.tuneDepthAlpha returns valid values", {
-  d <- peloquinFrank_5Alts
-  alphas <- seq(1, 3, by = 0.1)
-  depths <- 1:3
-  checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
-                  "palatable", "delicious")
-  compareIndices <- which(peloquinFrank_5Alts$words %in% checkWords)
-  results <- rsa.tuneDepthAlpha(data = d, groupName = "scale",
-                                quantityVarName = "stars", itemVarName = "words",
-                                semanticsVarName = "speaker.p", compareDataName = "e11",
-                                compareIndices = compareIndices, alphas = alphas, depths = depths)
-  expect_equal(nrow(results), length(alphas) * length(depths))
-})
