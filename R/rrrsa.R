@@ -13,8 +13,7 @@
 #'
 #' Data frames and tuning hypeparameters
 #'
-#' rrrsa provides easy functionality for data in data frames with \code{\link{rsa.runDf}},
-#' as well as for tuning hyperparamters \code{\link{rsa.tuneDepthAlpha}}
+#' rrrsa provides easy functionality for data in data frames with \code{\link{rsa.runDf}}
 #'
 #' @docType package
 #'

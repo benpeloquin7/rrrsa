@@ -98,10 +98,10 @@ rsa.reason(m = m, depth = 2) %>%
 ```
 
 ### Running data frames with `rsa.runDf()`
-Run RSA on a tidied data frame and avoid running individual model components individually with `rsa.runDf`. An RSA-ready, tidied data frame must contian columns for semantic `quantity`, `item` and `semantics`, where each row corresponds with unique `item`/`quantity` combination. A user should specify their naming convention for these items in the `quantityVarName`, `itemVarName` and `semanticsVarName` arguments. The `costVarName` and `priorsVarName` args correspond with `costs` and/or `priors` data. Users can specify values for `alpha` and `depth` hyperparamenters. `runDf` will return a data frame with a new model predictions `preds` column appended.
+Run RSA on a tidied data frame and avoid running individual model components individually with `rsa.runDf()`. This is the primary workhorse function of `rrrsa`. An rrrsa-ready, tidied data frame must contian columns for semantic `quantity`, `item` and `semantics`, where each row corresponds with unique `item`/`quantity` combination. A user should specify their naming convention for these items in the `quantityVarName`, `itemVarName` and `semanticsVarName` arguments. The `costVarName` and `priorsVarName` args correspond with `costs` and/or `priors` data. Users can specify values for `alpha` and `depth` hyperparamenters. `runDf` will return a data frame with a new model predictions `preds` column appended.
 
 ```{r rsa.runDf_demo}
-## Hypothetical literal listener data we might want to compute RSA on.
+## Hypothetical literal listener data we might want to use RSA to simulate implicature.
 df <- data.frame(scales = rep("some_all", 15),
                   stars = as.factor(rep(1:5, 3)),
                   starsChar = as.factor(rep(c("one", "two", "three", "four", "five"), 3)),
@@ -137,7 +137,7 @@ df <- data.frame(scales = c(rep("some_all", 10), rep("good_excellent", 10)),
                                 0.0, rep(0.25, 4))) %>% mutate(priors = 0.20)
 df$costs <- c(rep(3, 5), rep(4, 5), rep(9, 5), rep(4, 5))
 
-## Using purrr::map_df run rsa.runDf over df subsets
+## Using purrr::map_df() run rsa.runDf() over df subsets
 df %>%
   split(.$scales) %>%
   map_df(~rsa.runDf(
@@ -173,7 +173,7 @@ See `?peloquinFrank_2alts` for data descriptions.
 
 RSA hyperparameters `alpha` and `depth` can be tuned using custom functions. Here we give a simple example of hyperparamter tuning with grid search using nested for loops. We examine empirical data from Peloquin & Frank (2016).
 
-In this case our grouping variable is `scales` -- we run `rsa.runDf` on each scale subset for each alpha and depth we're interested in savign the results to `res`.
+In this case our grouping variable is `scales` -- we run `rsa.runDf()` on each scale subset for each alpha and depth we're interested in saving the results to `res`.
 ```{r tuning_hyperparams_demo, warnings=FALSE, messages=FALSE}
 ## hyperparams
 depths <- seq(0, 4)
@@ -225,7 +225,7 @@ ggplot(d_cors, aes(x=alpha, y=r, col=as.factor(depth))) +
 d_cors %>%
   summarise(max_r=max(r),
             max_alpha=alpha[which.max(r)],
-            max_depth=alpha[which.max(r)]) %>%
+            max_depth=depth[which.max(r)]) %>%
   kable()
 ```
 
@@ -249,9 +249,9 @@ For more detailed information on the data included in `d_pragmods` run.
 
 ### RSA simulations
 
-Unlike in the previous example, we'd like to run rsa via `rsa.runDf()` over individual experiments rather than scales. We've provided a grouping variable in the data frame (`grouper`) which allows us to to do this.
+Unlike in the previous example, we'd like to run rsa via `rsa.runDf()` over individual experiments rather than scales. We've provided a grouping variable in the data frame (`grouper`) which allows us to do this.
 
-Here we split by the grouping variable `grouper` and use `purrr`'s `map_df` function which allows us to run our `rsa.run_df` over subsets of the data frame. This equivalent to subsetting `d_pragmods` by each factor in `grouper`, running `rsa.rund_df` and `rbind()`ing the results.
+We split by the grouping variable `grouper` and use `purrr::map_df()` which allows us to run `rsa.run_df()` over subsets of the data frame. This equivalent to subsetting `d_pragmods` by each factor in `grouper`, running `rsa.rund_df` and `rbind()`ing the results.
 ```{r pragmods_sim_1}
 d_preds_priors <- d_pragmods %>%
   split(list(.$grouper)) %>%
