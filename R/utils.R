@@ -1,3 +1,77 @@
+#' Tune depth and alpha hyperparamters
+#'
+#' Return a list with number of alpha * depths elements
+#' each element includes a tuple of (correlation, alpha, depth).
+#' Same basic call functionality as \code{runDf()}
+#' @param data, tidied data
+#' @param quantityVarName, entity name we're quantifying over
+#' @param semanticsVarName, semantic values for inference computation
+#' @param itemVarName, unique items were comparing, probaby words
+#' @param groupName, grouping variable if we have one
+#' @param compareDataName, pragmatic judgments we're comparing to
+#' @param costsVarName, costs variable name
+#' @param priorsVarName, priors variable name
+#' @param depths, vector of depths (in integers) for tuning
+#' @param alphas, vector of alphas for tuning
+#' @param compareIndices, specific indices in data frame
+#' @param usePriorEveryRecurse, boolean incorporate priors during each full recursion
+#' @importFrom stats "na.omit"
+#' @importFrom stats "cor"
+#' @return list of length(alphas) * length(depths) tuples with (correlation, depth, alpha)
+#' @keywords data tuning
+#' @export
+#' @examples
+#' d <- peloquinFrank_5Alts
+#' alphas <- seq(1, 3, by = 0.1)
+#' depths <- 1:3
+#' checkWords <- c("some", "all", "good", "excellent", "liked", "loved", "memorable", "unforgettable",
+#' "palatable", "delicious")
+#' compareIndices <- which(peloquinFrank_5Alts$words %in% checkWords)
+#' results <- rsa.tuneDepthAlpha(data = d, groupName = "scale",
+#' quantityVarName = "stars", itemVarName = "words",
+#' semanticsVarName = "speaker.p", compareDataName = "e11",
+#' compareIndices = compareIndices, alphas = alphas, depths = depths)
+#' head(results)
+#' best <- which.max(unlist(lapply(results, function(i) i[[1]][1])))
+#' results[[best]]
+#'
+rsa.tuneDepthAlpha <- function(data, quantityVarName, semanticsVarName, itemVarName, groupName = NA, compareDataName,
+                               costsVarName = NA, priorsVarName = NA, depths = 1, alphas = 1, compareIndices = NA,
+                               usePriorEveryRecurse = TRUE) {
+
+  cors <- data.frame(cor = NA, depth = NA, alpha = NA)
+  ## running multiple groups
+  if (!is.na(groupName)) {
+    for (a in alphas) {
+      for (d in depths) {
+        currRun <- plyr::ddply(data, .fun = rsa.runDf, .variables = c(groupName),
+                               quantityVarName = quantityVarName,
+                               semanticsVarName = semanticsVarName,
+                               itemVarName = itemVarName,
+                               costsVarName = costsVarName,
+                               priorsVarName = priorsVarName,
+                               depth = d, alpha = a, usePriorEveryRecurse = usePriorEveryRecurse)
+        if (length(compareIndices) == 1 & is.na(compareIndices[1])) {
+          res <- c(cor = cor(currRun[, compareDataName],
+                             currRun[, "preds"], use = "pairwise.complete.obs"),
+                   depth = d, alpha = a)
+          cors <- rbind(cors, res)
+          }
+        else {
+            compareData <- currRun[compareIndices, ]
+            # compareData <- subset(currRun, words %in% compareItems)
+            res <- c(cor = cor(compareData[, compareDataName],
+                               compareData[, "preds"], use = "pairwise.complete.obs"),
+                     depth = d, alpha = a)
+            cors <- rbind(cors, res)
+        }
+      }
+    }
+  }
+  cors <- na.omit(cors)
+  cors[order(-cors$cor), ]
+}
+
 #' Run RSA on a tidied data frame subset (by group or on DF with one grouping var)
 #'
 #' Expects tidied data with three required (1-3) and two optional fields (4, 5)
