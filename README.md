@@ -42,3 +42,8 @@ In the RSA framework one full recursion consists of a `pragmatic listner` $P_{L_
 ### Running data frames
  
 Run RSA on a tidied data frame and avoid running individual model components individually with `rsa.runDf`. An RSA-ready, tidied data frame must contian columns for semantic `quantity`, `item` and `semantics`, where each row corresponds with unique `item`/`quantity` combination. A user should specify their naming convention for these items in the `quantityVarName`, `itemVarName` and `semanticsVarName` arguments. The `costVarName` and `priorsVarName` args correspond with `costs` and/or `priors` data. Users can specify values for `alpha` and `depth` hyperparamenters. `runDf` will return a data frame with a new model predictions `preds` column appended.
+
+For more specific examples of `rrrsa` and example analysis using data from Frank, et al. (Under Review) and Peloquin & Frank (2016) please see:
+```{r run_vignette, eval=FALSE}
+vignette("summary", package="rrrsa")
+```
