@@ -3,6 +3,7 @@
 `rrrsa` is an R package for running RSA models -- Bayesian models of pragmatic inference. `rrrsa` was created by Ben Peloquin in collaboration with Michael C. Frank and has been optimized for analysis of experimental data such as those presented in Frank, et al. (Under Review) and Peloquin & Frank (2016). For other, more flexible variants of RSA models, please see http://forestdb.org/models/scalar-implicature.html.
 
 ## Installation
+-----
 You can install the latest version of `rrrsa` by installing `devtools` and running:
 ```{r install_demo, eval=FALSE}
 install.packages("devtools")
