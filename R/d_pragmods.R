@@ -10,25 +10,25 @@
 #'
 #' `prior` :: type of prior for current row.
 #'
-#' `query` :: target query corresponding to `p` and `speaker.p`
+#' `query` :: target query corresponding to `p` and `speaker.p`.
 #'
-#' `object` :: type of object being queried
+#' `object` :: type of object being queried.
 #'
-#' `count` :: number of times participants selected a queried object in this experiment
+#' `count` :: number of times participants selected a queried object in this experiment.
 #'
-#' `p` :: proportion of times participants selected a queried object in this experiment. This is the value we try to predict with `rsa`
+#' `p` :: proportion of times participants selected a queried object in this experiment. This is the value we try to predict with `rsa`.
 #'
-#' `n` :: sample size
+#' `n` :: sample size.
 #'
-#' `cih` and `cil` :: high/low 95% CIs on `p`
+#' `cih` and `cil` :: high/low 95\% CIs on `p`.
 #'
-#' `priorType` :: type of prior
+#' `priorType` :: type of prior.
 #'
-#' `priorValue` :: proportion of times choosing `priortype`
+#' `priorValue` :: proportion of times choosing `priorType`.
 #'
-#' `grouper` :: grouping variable for compatibility with `rsa.runDf()` and `purrr::map_df()`
+#' `grouper` :: grouping variable by experiment and conditoin (useful for running `rsa.runDf()` and `purrr::map_df()`).
 #'
-#' `speaker.p` :: literal listener semantics
+#' `speaker.p` :: literal listener semantics.
 #'
 #' @name d_pragmods
 #' @docType data
