@@ -28,7 +28,7 @@ $$P_{S_n} \propto e^{U(m;u)}$$
 $$U(m;u) = -\alpha(-\log(P_{L_{n-1}}(m|u)) - C(u))$$
 
 ## rrrsa includes empirical data
-Data from "Rational speech act models of pragmatic reasoning in reference games" (Frank, et al., Under Reivew) and "Determining the alternatives in scalar implicature" (Peloquin & Frank, 2016) are also included in this package. Examples using data from these studies are included below.
+Data from "Rational speech act models of pragmatic reasoning in reference games" (Frank, et al., Under Review) and "Determining the alternatives in scalar implicature" (Peloquin & Frank, 2016) are also included in this package. Examples using data from these studies are included below.
 
 ## rrrsa includes access to all model components
 `rrrsa` provides users with access to all model components. The following sections demonstrate how this functionality can be used.
@@ -98,7 +98,7 @@ rsa.reason(m = m, depth = 2) %>%
 ```
 
 ### Running data frames with `rsa.runDf()`
-Run RSA on a tidied data frame and avoid running individual model components individually with `rsa.runDf()`. This is the primary workhorse function of `rrrsa`. An rrrsa-ready, tidied data frame must contian columns for semantic `quantity`, `item` and `semantics`, where each row corresponds with unique `item`/`quantity` combination. A user should specify their naming convention for these items in the `quantityVarName`, `itemVarName` and `semanticsVarName` arguments. The `costVarName` and `priorsVarName` args correspond with `costs` and/or `priors` data. Users can specify values for `alpha` and `depth` hyperparamenters. `runDf` will return a data frame with a new model predictions `preds` column appended.
+Run RSA on a tidied data frame and avoid running individual model components individually with `rsa.runDf()`. This is the primary workhorse function of `rrrsa`. An rrrsa-ready, tidied data frame must contian columns for semantic `quantity`, `item` and `semantics`, where each row corresponds with unique `item`/`quantity` combination. A user should specify their naming convention for these items in the `quantityVarName`, `itemVarName` and `semanticsVarName` arguments. The `costVarName` and `priorsVarName` args correspond with `costs` and/or `priors` data. Users can specify values for `alpha` and `depth` hyperparamenters. `rsa,runDf()` will return a data frame with model predictions `preds` appended as a new column.
 
 ```{r rsa.runDf_demo}
 ## Hypothetical literal listener data we might want to use RSA to simulate implicature.
@@ -251,7 +251,7 @@ For more detailed information on the data included in `d_pragmods` run.
 
 Unlike in the previous example, we'd like to run rsa via `rsa.runDf()` over individual experiments rather than scales. We've provided a grouping variable in the data frame (`grouper`) which allows us to do this.
 
-We split by the grouping variable `grouper` and use `purrr::map_df()` which allows us to run `rsa.run_df()` over subsets of the data frame. This equivalent to subsetting `d_pragmods` by each factor in `grouper`, running `rsa.rund_df` and `rbind()`ing the results.
+We split by the grouping variable `grouper` and use `purrr::map_df()` which allows us to run `rsa.runDf()` over subsets of the data frame. This equivalent to subsetting `d_pragmods` by each factor in `grouper`, running `rsa.runDf` and `rbind()`ing the results.
 ```{r pragmods_sim_1}
 d_preds_priors <- d_pragmods %>%
   split(list(.$grouper)) %>%
