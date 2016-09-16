@@ -27,6 +27,8 @@ $$P_{L_n}(m|u) \propto P_{S_n}(u|m)P(m)$$
 $$P_{S_n} \propto e^{U(m;u)}$$
 $$U(m;u) = -\alpha(-\log(P_{L_{n-1}}(m|u)) - C(u))$$
 
+See Frank & Goodman (2012) and Goodman & Stuhmuller (2013) for the original descriptions of the RSA framework. Frank, et al. (Under Review) also provides a comprehensive presentation and evaluation of RSA.
+
 ## rrrsa includes empirical data
 Data from "Rational speech act models of pragmatic reasoning in reference games" (Frank, et al., Under Review) and "Determining the alternatives in scalar implicature" (Peloquin & Frank, 2016) are also included in this package. Examples using data from these studies are included below.
 
@@ -58,7 +60,7 @@ rsa.utility(items = literalSemantics, costs = costs, alpha = 3)
 ```
 
 ### Computing one full recursion with `rsa.fullRecursion()`
-In the RSA framework one full recursion consists of a `pragmatic listner` $P_{L_1}$ who reasons about a `rational speaker` $P_{s_1}$ who reason about a `literal listener` $P_{L_0}$. Expected input is an $m$ matrix of  $P_{L_0}$ `literal listener` values in which columns corresond to items (words) and rows correspond to semantic quantity (stars in Peloquin & Frank, 2016). Optional arguments include a `costs` vector which whould be the same length as `ncol` and an optional `priors` vector which should the same length as `nrows`. `rsa.fullRecursion()` provides safety checking for these cases. Output corresponds with pragmatic listener posterior predictions.
+In the RSA framework one full recursion consists of a `pragmatic listner` $P_{L_1}$ who reasons about a `rational speaker` $P_{s_1}$ who reason about a `literal listener` $P_{L_0}$. Expected input is an $m$ matrix of  $P_{L_0}$ `literal listener` values in which columns correspond to items (words) and rows correspond to semantic quantity (i.e. "stars" in Peloquin & Frank, 2016). Optional arguments include a `costs` vector which must be the same length as `ncol` and an optional `priors` vector which must be the same length as `nrows`. `rsa.fullRecursion()` provides safety checking for these cases. Output corresponds with pragmatic listener posterior predictions.
 ```{r rsa.full_recursion_demo, fig.height=5, fig.width=6}
 m <- matrix(data = c(1.0, 0.0, 0.0, 0.0, 0.0,
                      0.0, 0.25, 0.25, 0.25, 0.25,
@@ -98,7 +100,7 @@ rsa.reason(m = m, depth = 2) %>%
 ```
 
 ### Running data frames with `rsa.runDf()`
-Run RSA on a tidied data frame and avoid running individual model components individually with `rsa.runDf()`. This is the primary workhorse function of `rrrsa`. An rrrsa-ready, tidied data frame must contian columns for semantic `quantity`, `item` and `semantics`, where each row corresponds with unique `item`/`quantity` combination. A user should specify their naming convention for these items in the `quantityVarName`, `itemVarName` and `semanticsVarName` arguments. The `costVarName` and `priorsVarName` args correspond with `costs` and/or `priors` data. Users can specify values for `alpha` and `depth` hyperparamenters. `rsa,runDf()` will return a data frame with model predictions `preds` appended as a new column.
+Run RSA on a tidied data frame and avoid running individual model components individually with `rsa.runDf()`. This is the primary workhorse function of `rrrsa`. An rrrsa-ready, tidied data frame must contain columns for semantic `quantity`, `item` and `semantics`, where each row corresponds with unique `item`/`quantity` combination. A user should specify their naming convention for these items in the `quantityVarName`, `itemVarName` and `semanticsVarName` arguments. The `costVarName` and `priorsVarName` arguments correspond with `costs` and/or `priors` data. Users can specify values for `alpha` and `depth` hyperparamenters. `rsa.runDf()` will return a data frame with model predictions '`preds`' appended as a new column.
 
 ```{r rsa.runDf_demo}
 ## Hypothetical literal listener data we might want to use RSA to simulate implicature.
@@ -120,14 +122,15 @@ Importantly, `rsa.runDf()` maintains all column naming and can handle multiple d
 ```{r rsa.runDf_demo2}
 all(rsa.runDf(df, quantityVarName = "starsChar",
               semanticsVarName = "listenerSemantics",
-            itemVarName = "words") ==
-       rsa.runDf(df, quantityVarName = "stars",
-            semanticsVarName = "listenerSemantics",
-            itemVarName = "words"))
+              itemVarName = "words") ==
+      rsa.runDf(df, quantityVarName = "stars",
+                 semanticsVarName = "listenerSemantics",
+                 itemVarName = "words"))
 ```
 
 A frequent use case for RSA will require running RSA over multiple groups of data. Rather than subsetting data frames and running RSA iteratively, we recommend using `map_df()` from the `purrr` package. Here we split by the `scales` variable.
 ```{r rsa.runDf_map_df, message=FALSE}
+## RSA of literal semantics we'd like to run RSA on
 df <- data.frame(scales = c(rep("some_all", 10), rep("good_excellent", 10)),
                   stars = as.factor(rep(1:5, 4)),
                   words = c(rep("all", 5), rep("some", 5), c(rep("excellent", 5), rep("good", 5))),
@@ -169,7 +172,7 @@ str(peloquinFrank_2Alts) %>%
   kable()
 ```
 
-See `?peloquinFrank_2alts` for data descriptions.
+See `?peloquinFrank_2alts` for data descriptions and [link to CogSci paper here...]
 
 RSA hyperparameters `alpha` and `depth` can be tuned using custom functions. Here we give a simple example of hyperparamter tuning with grid search using nested for loops. We examine empirical data from Peloquin & Frank (2016).
 
